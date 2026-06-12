@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ボイスみっけ｜録音して、すぐ整理</title>
+<meta name="description" content="商談・会議・相談をスマホで録音して、テーマ別にAIが自動整理。議事録・商談記録・お客様対応メモがすぐ作れます。">
+<meta name="theme-color" content="#1e3a5f">
+<style>
+  :root {
+    --navy:      #1e3a5f;
+    --navy-2:    #2d5282;
+    --blue:      #2563eb;
+    --blue-l:    #dbeafe;
+    --bg:        #f0f4f8;
+    --white:     #ffffff;
+    --text:      #1e293b;
+    --muted:     #64748b;
+    --border:    #cbd5e1;
+    --red:       #dc2626;
+    --red-l:     #fee2e2;
+    --green:     #16a34a;
+    --radius:    14px;
+    --shadow:    0 4px 20px rgba(0,0,0,0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ── ヘッダー ── */
+  header {
+    width: 100%;
+    background: var(--navy);
+    color: var(--white);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  header .logo {
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+  }
+  header .logo span { color: #60a5fa; }
+
+  /* ── 共通コンテナ ── */
+  .container {
+    width: 100%;
+    max-width: 480px;
+    padding: 20px 16px 40px;
+    flex: 1;
+  }
+
+  /* ── スクリーン切替 ── */
+  .screen { display: none; }
+  .screen.active {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    animation: fadeUp 0.28s ease;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── カード ── */
+  .card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 22px 18px;
+    box-shadow: var(--shadow);
+  }
+
+  /* ── ボタン ── */
+  .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.12s, opacity 0.12s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn:active { transform: scale(0.97); opacity: 0.88; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-primary { background: var(--blue); color: var(--white); }
+  .btn-navy    { background: var(--navy); color: var(--white); }
+  .btn-ghost   { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
+  .btn-red     { background: var(--red); color: var(--white); }
+  .btn-green   { background: var(--green); color: var(--white); }
+  .btn-line    { background: #06c755; color: var(--white); }
+  .btn-sm      { padding: 12px; font-size: 0.9rem; }
+
+  /* ── タイトル ── */
+  h2 { font-size: 1.25rem; font-weight: 700; color: var(--navy); }
+  h3 { font-size: 1rem; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+  p  { font-size: 0.92rem; color: var(--muted); line-height: 1.6; }
+
+  /* ── ────────────────────── ── */
+  /* スクリーン 1: トップ */
+  /* ── ────────────────────── ── */
+  .hero {
+    text-align: center;
+    padding: 30px 20px 24px;
+  }
+  .hero-icon {
+    font-size: 3.5rem;
+    margin-bottom: 12px;
+    display: block;
+  }
+  .hero h1 {
+    font-size: 1.7rem;
+    font-weight: 800;
+    color: var(--navy);
+    line-height: 1.3;
+    margin-bottom: 10px;
+  }
+  .hero h1 span { color: var(--blue); }
+  .hero p {
+    font-size: 0.95rem;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+  .feature-list {
+    list-style: none;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+  .feature-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 0.9rem;
+    color: var(--text);
+  }
+  .feature-list li .icon {
+    background: var(--blue-l);
+    color: var(--blue);
+    border-radius: 8px;
+    padding: 4px 8px;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+  .notice {
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 0.82rem;
+    color: #9a3412;
+    line-height: 1.5;
+  }
+  .btn-record-big {
+    font-size: 1.15rem;
+    padding: 20px;
+    border-radius: 16px;
+  }
+
+  /* ── ────────────────────── ── */
+  /* スクリーン 2: 録音中 */
+  /* ── ────────────────────── ── */
+  .record-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    padding: 30px 0 10px;
+  }
+  .pulse-wrapper {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .pulse-ring {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: rgba(220, 38, 38, 0.2);
+    animation: pulse 1.4s ease-out infinite;
+  }
+  .pulse-ring:nth-child(2) { animation-delay: 0.5s; }
+  @keyframes pulse {
+    0%   { transform: scale(0.7); opacity: 0.8; }
+    100% { transform: scale(1.3); opacity: 0; }
+  }
+  .mic-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--red);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    box-shadow: 0 4px 16px rgba(220,38,38,0.4);
+    position: relative;
+    z-index: 1;
+  }
+  .rec-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--red-l);
+    color: var(--red);
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+  .rec-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--red);
+    animation: blink 0.9s ease-in-out infinite;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.2; }
+  }
+  .timer {
+    font-size: 2.8rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    color: var(--navy);
+    letter-spacing: 0.05em;
+  }
+  .live-text-box {
+    width: 100%;
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 14px;
+    min-height: 80px;
+    font-size: 0.88rem;
+    color: var(--text);
+    line-height: 1.6;
+    border: 1px solid var(--border);
+  }
+  #interim-text { color: var(--muted); font-style: italic; }
+
+  /* ── ────────────────────── ── */
+  /* スクリーン 3: 確認・テーマ選択 */
+  /* ── ────────────────────── ── */
+  textarea {
+    width: 100%;
+    min-height: 140px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    color: var(--text);
+    resize: vertical;
+    background: var(--white);
+    line-height: 1.6;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  textarea:focus { border-color: var(--blue); }
+
+  .theme-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .theme-card {
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 12px;
+    cursor: pointer;
+    background: var(--white);
+    transition: border-color 0.18s, background 0.18s, transform 0.12s;
+    text-align: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .theme-card:active { transform: scale(0.96); }
+  .theme-card.selected {
+    border-color: var(--blue);
+    background: var(--blue-l);
+  }
+  .theme-card .t-icon { font-size: 1.6rem; margin-bottom: 6px; display: block; }
+  .theme-card .t-name { font-size: 0.82rem; font-weight: 700; color: var(--navy); display: block; }
+  .theme-card.selected .t-name { color: var(--blue); }
+
+  /* ── ────────────────────── ── */
+  /* スクリーン 4: 処理中 */
+  /* ── ────────────────────── ── */
+  .loading-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 60px 0;
+    text-align: center;
+  }
+  .spinner {
+    width: 56px;
+    height: 56px;
+    border: 5px solid var(--border);
+    border-top-color: var(--blue);
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-msg { font-size: 1rem; color: var(--muted); font-weight: 500; }
+
+  /* ── ────────────────────── ── */
+  /* スクリーン 5: 結果・共有 */
+  /* ── ────────────────────── ── */
+  .result-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .result-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    background: var(--blue);
+    color: var(--white);
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+  .result-body {
+    white-space: pre-wrap;
+    font-size: 0.9rem;
+    line-height: 1.75;
+    color: var(--text);
+    background: var(--bg);
+    border-radius: 10px;
+    padding: 14px;
+    min-height: 120px;
+    border: 1px solid var(--border);
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+  .share-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .share-grid .btn-green { grid-column: 1 / -1; }
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── トースト ── */
+  #toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: #1e293b;
+    color: var(--white);
+    padding: 12px 24px;
+    border-radius: 24px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: transform 0.3s ease;
+    z-index: 999;
+    white-space: nowrap;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ── ブラウザ非対応バナー ── */
+  #compat-banner {
+    display: none;
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 0.83rem;
+    color: #856404;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <span style="font-size:1.4rem">🎙️</span>
+  <span class="logo">ボイス<span>みっけ</span></span>
+</header>
+
+<div class="container">
+
+  <!-- ======== スクリーン1: トップ ======== -->
+  <div id="screen-top" class="screen active">
+    <div id="compat-banner">
+      ⚠️ お使いのブラウザは音声認識に対応していない可能性があります。<strong>Chrome（Android）</strong>または<strong>Safari（iPhone）</strong>をお使いください。
+    </div>
+    <div class="card hero">
+      <span class="hero-icon">🎙️</span>
+      <h1>録音して、<br><span>すぐ整理。</span></h1>
+      <p>商談・会議・相談をスマホで録音。<br>AIがテーマに合わせて自動整理します。</p>
+      <ul class="feature-list">
+        <li><span class="icon">📝</span><span>議事録・商談記録・士業メモなど5テーマ対応</span></li>
+        <li><span class="icon">⚡</span><span>録音→整理→共有がスマホ1台で完結</span></li>
+        <li><span class="icon">💬</span><span>LINEやメールにワンタップで送信</span></li>
+      </ul>
+      <button class="btn btn-primary btn-record-big" onclick="startRecording()">
+        🎙️ 録音を開始する
+      </button>
+    </div>
+    <div class="notice">
+      📌 <strong>ご利用の前に：</strong> マイクの使用許可が必要です。ブラウザから許可を求められた場合は「許可」を選択してください。<br>
+      推奨ブラウザ：Chrome（Android）/ Safari（iPhone）
+    </div>
+  </div>
+
+  <!-- ======== スクリーン2: 録音中 ======== -->
+  <div id="screen-record" class="screen">
+    <div class="card record-center">
+      <div class="rec-badge">
+        <span class="rec-dot"></span> REC
+      </div>
+      <div class="pulse-wrapper">
+        <div class="pulse-ring"></div>
+        <div class="pulse-ring"></div>
+        <div class="mic-circle">🎙️</div>
+      </div>
+      <div class="timer" id="timer">00:00</div>
+      <p style="text-align:center; font-size:0.88rem;">話し終わったら停止ボタンを押してください</p>
+    </div>
+    <div class="card">
+      <h3>🔄 リアルタイム文字起こし</h3>
+      <div class="live-text-box">
+        <span id="final-text"></span><span id="interim-text"></span>
+      </div>
+    </div>
+    <button class="btn btn-red" onclick="stopRecording()">
+      ⏹️ 録音を停止して次へ
+    </button>
+    <button class="btn btn-ghost btn-sm" onclick="cancelRecording()">
+      キャンセル
+    </button>
+  </div>
+
+  <!-- ======== スクリーン3: 文字起こし確認＋テーマ ======== -->
+  <div id="screen-transcript" class="screen">
+    <div class="card">
+      <h3>📄 文字起こし結果</h3>
+      <p style="margin-bottom:10px;">内容を確認・編集できます。</p>
+      <textarea id="transcript-text" placeholder="文字起こしテキストがここに表示されます。直接編集もできます。"></textarea>
+    </div>
+    <div class="card">
+      <h3>🗂️ 整理テーマを選択</h3>
+      <p style="margin-bottom:14px;">AIがどの形式で整理するかを選んでください。</p>
+      <div class="theme-grid">
+        <div class="theme-card" data-theme="gijiroku" onclick="selectTheme('gijiroku')">
+          <span class="t-icon">📋</span>
+          <span class="t-name">議事録</span>
+        </div>
+        <div class="theme-card" data-theme="shodan" onclick="selectTheme('shodan')">
+          <span class="t-icon">🤝</span>
+          <span class="t-name">商談記録</span>
+        </div>
+        <div class="theme-card" data-theme="customer" onclick="selectTheme('customer')">
+          <span class="t-icon">👤</span>
+          <span class="t-name">お客様対応メモ</span>
+        </div>
+        <div class="theme-card" data-theme="shigyou" onclick="selectTheme('shigyou')">
+          <span class="t-icon">⚖️</span>
+          <span class="t-name">士業の相談メモ</span>
+        </div>
+        <div class="theme-card" data-theme="idea" onclick="selectTheme('idea')" style="grid-column: 1 / -1;">
+          <span class="t-icon">💡</span>
+          <span class="t-name">アイデア・開発メモ</span>
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-navy" id="btn-summarize" onclick="summarize()" disabled>
+      ✨ AIで整理する
+    </button>
+    <button class="btn btn-ghost btn-sm" onclick="showScreen('screen-record'); resumeRecording()">
+      ← 録音に戻る
+    </button>
+  </div>
+
+  <!-- ======== スクリーン4: 処理中 ======== -->
+  <div id="screen-loading" class="screen">
+    <div class="card loading-center">
+      <div class="spinner"></div>
+      <p class="loading-msg">AIが整理中です…<br>少しお待ちください</p>
+    </div>
+  </div>
+
+  <!-- ======== スクリーン5: 結果・共有 ======== -->
+  <div id="screen-result" class="screen">
+    <div class="card">
+      <div class="result-header">
+        <span class="result-label" id="theme-label-badge">議事録</span>
+        <span style="font-size:0.82rem; color:var(--muted);">AI整理結果</span>
+      </div>
+      <div class="result-body" id="result-text"></div>
+    </div>
+    <div class="card">
+      <h3>📤 共有・保存</h3>
+      <div class="share-grid" style="margin-bottom:12px;">
+        <button class="btn btn-green" onclick="copyResult()">
+          📋 コピーする
+        </button>
+        <button class="btn btn-line btn-sm" onclick="shareToLine()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.627-.63h2.386c.349 0 .63.285.63.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.627-.63.349 0 .631.285.631.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.281.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.070 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
+          LINEで送る
+        </button>
+        <button class="btn btn-ghost btn-sm" onclick="shareToEmail()">
+          ✉️ メールで送る
+        </button>
+      </div>
+      <div class="divider">または</div>
+    </div>
+    <button class="btn btn-primary" onclick="resetAll()">
+      🎙️ 新しく録音する
+    </button>
+    <button class="btn btn-ghost btn-sm" onclick="showScreen('screen-transcript')">
+      ← テーマを変更する
+    </button>
+  </div>
+
+</div><!-- /container -->
+
+<div id="toast"></div>
+
+<script>
+// ─────────────────────────────────────────────
+// 設定：Cloudflare WorkerのURLをここに入力
+// ─────────────────────────────────────────────
+const WORKER_URL = 'https://YOUR_WORKER_NAME.YOUR_ACCOUNT.workers.dev';
+
+// ─────────────────────────────────────────────
+// テーマ定義
+// ─────────────────────────────────────────────
+const THEMES = {
+  gijiroku: '議事録',
+  shodan:   '商談記録',
+  customer: 'お客様対応メモ',
+  shigyou:  '士業の相談メモ',
+  idea:     'アイデア・開発メモ',
+};
+
+// ─────────────────────────────────────────────
+// グローバル状態
+// ─────────────────────────────────────────────
+let recognition    = null;
+let isRecording    = false;
+let finalTranscript = '';
+let timerInterval  = null;
+let elapsedSeconds = 0;
+let selectedTheme  = '';
+
+// ─────────────────────────────────────────────
+// 初期化
+// ─────────────────────────────────────────────
+(function init() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    document.getElementById('compat-banner').style.display = 'block';
+  }
+})();
+
+// ─────────────────────────────────────────────
+// 画面切替
+// ─────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ─────────────────────────────────────────────
+// 録音開始
+// ─────────────────────────────────────────────
+function startRecording() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    alert('音声認識に対応していません。Chrome（Android）またはSafari（iPhone）でお試しください。');
+    return;
+  }
+
+  finalTranscript = '';
+  elapsedSeconds  = 0;
+  isRecording     = true;
+
+  // UIリセット
+  document.getElementById('timer').textContent    = '00:00';
+  document.getElementById('final-text').textContent  = '';
+  document.getElementById('interim-text').textContent = '';
+
+  setupRecognition();
+  recognition.start();
+  startTimer();
+  showScreen('screen-record');
+}
+
+function setupRecognition() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SR();
+  recognition.lang            = 'ja-JP';
+  recognition.continuous      = true;
+  recognition.interimResults  = true;
+  recognition.maxAlternatives = 1;
+
+  recognition.onresult = (e) => {
+    let interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const t = e.results[i][0].transcript;
+      if (e.results[i].isFinal) {
+        finalTranscript += t;
+      } else {
+        interim += t;
+      }
+    }
+    document.getElementById('final-text').textContent   = finalTranscript;
+    document.getElementById('interim-text').textContent = interim;
+  };
+
+  recognition.onerror = (e) => {
+    if (e.error === 'not-allowed') {
+      alert('マイクへのアクセスが拒否されました。\nブラウザの設定でマイクを許可してからお試しください。');
+      cancelRecording();
+    }
+    // no-speech / network はそのまま続行
+  };
+
+  // 自動停止後に再起動（長時間録音対応）
+  recognition.onend = () => {
+    if (isRecording) {
+      try { recognition.start(); } catch(_) {}
+    }
+  };
+}
+
+function startTimer() {
+  timerInterval = setInterval(() => {
+    elapsedSeconds++;
+    const m = String(Math.floor(elapsedSeconds / 60)).padStart(2, '0');
+    const s = String(elapsedSeconds % 60).padStart(2, '0');
+    document.getElementById('timer').textContent = `${m}:${s}`;
+  }, 1000);
+}
+
+// ─────────────────────────────────────────────
+// 録音停止
+// ─────────────────────────────────────────────
+function stopRecording() {
+  isRecording = false;
+  clearInterval(timerInterval);
+  if (recognition) recognition.stop();
+
+  const text = finalTranscript.trim();
+  if (!text) {
+    showToast('音声が認識されませんでした。もう一度お試しください。');
+    showScreen('screen-top');
+    return;
+  }
+
+  document.getElementById('transcript-text').value = text;
+  selectedTheme = '';
+  document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('btn-summarize').disabled = true;
+  showScreen('screen-transcript');
+}
+
+function cancelRecording() {
+  isRecording = false;
+  clearInterval(timerInterval);
+  if (recognition) recognition.stop();
+  showScreen('screen-top');
+}
+
+function resumeRecording() {
+  // 録音画面に戻るが録音は再開しない（確認済みのケースのみ）
+}
+
+// ─────────────────────────────────────────────
+// テーマ選択
+// ─────────────────────────────────────────────
+function selectTheme(theme) {
+  selectedTheme = theme;
+  document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('selected'));
+  document.querySelector(`.theme-card[data-theme="${theme}"]`).classList.add('selected');
+  document.getElementById('btn-summarize').disabled = false;
+}
+
+// ─────────────────────────────────────────────
+// AI整理（Cloudflare Worker → Claude API）
+// ─────────────────────────────────────────────
+async function summarize() {
+  const text = document.getElementById('transcript-text').value.trim();
+  if (!text) {
+    showToast('テキストが空です。');
+    return;
+  }
+  if (!selectedTheme) {
+    showToast('テーマを選んでください。');
+    return;
+  }
+
+  showScreen('screen-loading');
+
+  try {
+    const res = await fetch(`${WORKER_URL}/summarize`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, theme: selectedTheme }),
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err);
+    }
+
+    const data = await res.json();
+    document.getElementById('result-text').textContent = data.result;
+    document.getElementById('theme-label-badge').textContent = THEMES[selectedTheme] || selectedTheme;
+    showScreen('screen-result');
+
+  } catch (err) {
+    console.error(err);
+    showScreen('screen-transcript');
+    showToast('エラーが発生しました。WorkerのURLを確認してください。');
+  }
+}
+
+// ─────────────────────────────────────────────
+// 共有
+// ─────────────────────────────────────────────
+function copyResult() {
+  const text = document.getElementById('result-text').textContent;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text)
+      .then(() => showToast('✅ コピーしました！'))
+      .catch(() => fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity  = '0';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
+  showToast('✅ コピーしました！');
+}
+
+function shareToLine() {
+  const text = document.getElementById('result-text').textContent;
+  const url  = `https://line.me/R/msg/text/?${encodeURIComponent(text)}`;
+  window.open(url, '_blank');
+}
+
+function shareToEmail() {
+  const text    = document.getElementById('result-text').textContent;
+  const subject = encodeURIComponent(`【ボイスみっけ】${THEMES[selectedTheme] || '記録'}`);
+  const body    = encodeURIComponent(text);
+  window.location.href = `mailto:?subject=${subject}&body=${body}`;
+}
+
+// ─────────────────────────────────────────────
+// リセット
+// ─────────────────────────────────────────────
+function resetAll() {
+  finalTranscript = '';
+  selectedTheme   = '';
+  elapsedSeconds  = 0;
+  document.getElementById('transcript-text').value       = '';
+  document.getElementById('result-text').textContent     = '';
+  document.getElementById('timer').textContent           = '00:00';
+  document.getElementById('final-text').textContent      = '';
+  document.getElementById('interim-text').textContent    = '';
+  document.getElementById('btn-summarize').disabled      = true;
+  document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('selected'));
+  showScreen('screen-top');
+}
+
+// ─────────────────────────────────────────────
+// トースト通知
+// ─────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+</script>
+</body>
+</html>

@@ -6,6 +6,7 @@
 <title>ボイスみっけ｜録音して、すぐ整理</title>
 <meta name="description" content="商談・会議・相談をスマホで録音して、テーマ別にAIが自動整理。議事録・商談記録・お客様対応メモがすぐ作れます。">
 <meta name="theme-color" content="#1e3a5f">
+<link rel="icon" type="image/png" href="https://spc-jp.github.io/voice-mikke/favicon.png">
 <style>
   :root {
     --navy:      #1e3a5f;
@@ -293,17 +294,32 @@
   .theme-card {
     border: 2px solid var(--border);
     border-radius: 12px;
-    padding: 14px 12px;
+    padding: 18px 12px;
     cursor: pointer;
     background: var(--white);
     transition: border-color 0.18s, background 0.18s, transform 0.12s;
     text-align: center;
     -webkit-tap-highlight-color: transparent;
+    min-height: 76px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
   }
   .theme-card:active { transform: scale(0.96); }
   .theme-card.selected {
     border-color: var(--blue);
     background: var(--blue-l);
+    position: relative;
+  }
+  .theme-card.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    color: var(--blue);
+    font-weight: 800;
+    font-size: 1rem;
   }
   .theme-card .t-icon { font-size: 1.6rem; margin-bottom: 6px; display: block; }
   .theme-card .t-name { font-size: 0.82rem; font-weight: 700; color: var(--navy); display: block; }
@@ -350,12 +366,12 @@
   }
   .result-body {
     white-space: pre-wrap;
-    font-size: 0.9rem;
-    line-height: 1.75;
+    font-size: 0.98rem;
+    line-height: 1.85;
     color: var(--text);
     background: var(--bg);
     border-radius: 10px;
-    padding: 14px;
+    padding: 16px;
     min-height: 120px;
     border: 1px solid var(--border);
     max-height: 50vh;
@@ -564,7 +580,7 @@
 // ─────────────────────────────────────────────
 // 設定：Cloudflare WorkerのURLをここに入力
 // ─────────────────────────────────────────────
-const WORKER_URL = 'https://YOUR_WORKER_NAME.YOUR_ACCOUNT.workers.dev';
+const WORKER_URL = 'https://voice-mikke.yymmatsu.workers.dev';
 
 // ─────────────────────────────────────────────
 // テーマ定義

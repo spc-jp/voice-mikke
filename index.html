@@ -135,6 +135,7 @@
   .btn-navy    { background: var(--navy); color: var(--white); }
   .btn-ghost   { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
   .btn-red     { background: var(--red); color: var(--white); }
+  .btn-orange  { background: #ea7000; color: var(--white); }
   .btn-green   { background: var(--green); color: var(--white); }
   .btn-line    { background: #06c755; color: var(--white); }
   .btn-sm      { padding: 12px; font-size: 0.9rem; }
@@ -603,9 +604,14 @@
         <span id="final-text"></span><span id="interim-text"></span>
       </div>
     </div>
-    <button class="btn btn-red" onclick="stopRecording()">
-      ⏹️ 録音を停止して次へ
-    </button>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+      <button class="btn btn-orange" id="btn-pause" onclick="pauseRecording()">
+        ⏸️ 一時停止
+      </button>
+      <button class="btn btn-red" onclick="stopRecording()">
+        ⏹️ 停止して次へ
+      </button>
+    </div>
     <button class="btn btn-ghost btn-sm" onclick="cancelRecording()">
       キャンセル
     </button>
@@ -936,6 +942,14 @@ function startRecording() {
   recognition.start();
   startTimer();
   showScreen('screen-record');
+
+  // 一時停止ボタンを初期状態に戻す
+  const btn = document.getElementById('btn-pause');
+  btn.textContent = '⏸️ 一時停止';
+  btn.className   = 'btn btn-orange';
+  btn.onclick     = pauseRecording;
+  const badge = document.querySelector('.rec-badge');
+  if (badge) badge.innerHTML = '<span class="rec-dot"></span> REC';
 }
 
 function setupRecognition() {
@@ -993,6 +1007,49 @@ function startTimer() {
     const s = String(elapsedSeconds % 60).padStart(2, '0');
     document.getElementById('timer').textContent = `${m}:${s}`;
   }, 1000);
+}
+
+// ─────────────────────────────────────────────
+// 一時停止・再開
+// ─────────────────────────────────────────────
+function pauseRecording() {
+  isPaused    = true;
+  isRecording = false;
+  clearInterval(timerInterval);
+  if (recognition) {
+    try { recognition.stop(); } catch(_) {}
+  }
+  // ボタンを「再開」に切り替え
+  const btn = document.getElementById('btn-pause');
+  btn.textContent = '▶️ 録音を再開';
+  btn.className   = 'btn btn-green';
+  btn.onclick     = resumeRecording;
+  // rec-badgeをPAUSEに変更
+  const badge = document.querySelector('.rec-badge');
+  if (badge) badge.innerHTML = '<span style="width:8px;height:8px;border-radius:50%;background:#ea7000;display:inline-block;margin-right:6px;"></span> PAUSE';
+  showToast('⏸️ 一時停止中');
+}
+
+function resumeRecording() {
+  isPaused    = false;
+  isRecording = true;
+  startTimer();
+  setupRecognition();
+  try {
+    recognition.start();
+  } catch(e) {
+    showToast('再開できませんでした。マイク許可を確認してください。');
+    return;
+  }
+  // ボタンを「一時停止」に戻す
+  const btn = document.getElementById('btn-pause');
+  btn.textContent = '⏸️ 一時停止';
+  btn.className   = 'btn btn-orange';
+  btn.onclick     = pauseRecording;
+  // rec-badgeをRECに戻す
+  const badge = document.querySelector('.rec-badge');
+  if (badge) badge.innerHTML = '<span class="rec-dot"></span> REC';
+  showToast('🎙️ 録音を再開しました');
 }
 
 // ─────────────────────────────────────────────

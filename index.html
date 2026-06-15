@@ -376,20 +376,78 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
-    padding: 60px 0;
+    gap: 28px;
+    padding: 60px 20px;
     text-align: center;
+    min-height: 320px;
+    justify-content: center;
   }
-  .spinner {
-    width: 56px;
+
+  /* 音波アニメーション */
+  .soundwave {
+    display: flex;
+    align-items: center;
+    gap: 5px;
     height: 56px;
-    border: 5px solid var(--border);
-    border-top-color: var(--blue);
-    border-radius: 50%;
-    animation: spin 0.9s linear infinite;
   }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .loading-msg { font-size: 1rem; color: var(--muted); font-weight: 500; }
+  .soundwave span {
+    display: block;
+    width: 5px;
+    border-radius: 10px;
+    background: linear-gradient(180deg, #60a5fa, #1e3a5f);
+    animation: wave 1.2s ease-in-out infinite;
+  }
+  .soundwave span:nth-child(1)  { height: 16px; animation-delay: 0s;    }
+  .soundwave span:nth-child(2)  { height: 32px; animation-delay: 0.1s;  }
+  .soundwave span:nth-child(3)  { height: 48px; animation-delay: 0.2s;  }
+  .soundwave span:nth-child(4)  { height: 56px; animation-delay: 0.3s;  }
+  .soundwave span:nth-child(5)  { height: 40px; animation-delay: 0.4s;  }
+  .soundwave span:nth-child(6)  { height: 56px; animation-delay: 0.3s;  }
+  .soundwave span:nth-child(7)  { height: 48px; animation-delay: 0.2s;  }
+  .soundwave span:nth-child(8)  { height: 32px; animation-delay: 0.1s;  }
+  .soundwave span:nth-child(9)  { height: 16px; animation-delay: 0s;    }
+  @keyframes wave {
+    0%, 100% { transform: scaleY(0.4); opacity: 0.5; }
+    50%       { transform: scaleY(1);   opacity: 1;   }
+  }
+
+  /* テキストフェード */
+  .loading-label {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--navy);
+    letter-spacing: 0.04em;
+  }
+  .loading-sub {
+    font-size: 0.82rem;
+    color: var(--muted);
+    animation: fadepulse 1.8s ease-in-out infinite;
+  }
+  @keyframes fadepulse {
+    0%, 100% { opacity: 0.4; }
+    50%       { opacity: 1;   }
+  }
+
+  /* ドット進捗 */
+  .loading-dots {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .loading-dots span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--blue);
+    animation: dotpop 1.2s ease-in-out infinite;
+  }
+  .loading-dots span:nth-child(1) { animation-delay: 0s;    }
+  .loading-dots span:nth-child(2) { animation-delay: 0.2s;  }
+  .loading-dots span:nth-child(3) { animation-delay: 0.4s;  }
+  @keyframes dotpop {
+    0%, 80%, 100% { transform: scale(0.6); opacity: 0.3; }
+    40%           { transform: scale(1.2); opacity: 1;   }
+  }
 
   /* ── ────────────────────── ── */
   /* スクリーン 5: 結果・共有 */
@@ -651,7 +709,7 @@
       </div>
     </div>
     <button class="btn btn-navy" id="btn-summarize" onclick="summarize()" disabled>
-      ✨ AIで整理する
+      🎙️ ボイスみっけで整理する
     </button>
 
     <!-- 無料体験終了時のみ表示 -->
@@ -677,8 +735,17 @@
   <!-- ======== スクリーン4: 処理中 ======== -->
   <div id="screen-loading" class="screen">
     <div class="card loading-center">
-      <div class="spinner"></div>
-      <p class="loading-msg">AIが整理中です…<br>少しお待ちください</p>
+      <div class="soundwave">
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span>
+      </div>
+      <div>
+        <p class="loading-label">🎙️ ボイスみっけ 整理中</p>
+        <p class="loading-sub">音声の内容を読み解いています</p>
+      </div>
+      <div class="loading-dots">
+        <span></span><span></span><span></span>
+      </div>
     </div>
   </div>
 
@@ -687,22 +754,20 @@
     <div class="card">
       <div class="result-header">
         <span class="result-label" id="theme-label-badge">議事録</span>
-        <span style="font-size:0.82rem; color:var(--muted);">AI整理結果</span>
+        <span style="font-size:0.82rem; color:var(--muted);">みっけ整理結果</span>
       </div>
+      <div style="font-size:0.78rem; color:var(--muted); margin-bottom:10px;" id="result-datetime"></div>
       <div class="result-body" id="result-text"></div>
     </div>
     <div class="card">
       <h3>📤 共有・保存</h3>
-      <div class="share-grid" style="margin-bottom:12px;">
+      <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:12px;">
         <button class="btn btn-green" onclick="copyResult()">
           📋 コピーする
         </button>
-        <button class="btn btn-line btn-sm" onclick="shareToLine()">
+        <button class="btn btn-line" onclick="shareToLine()">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.627-.63h2.386c.349 0 .63.285.63.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.627-.63.349 0 .631.285.631.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.281.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.070 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
           LINEで送る
-        </button>
-        <button class="btn btn-ghost btn-sm" onclick="shareToEmail()">
-          ✉️ メールで送る
         </button>
       </div>
       <div class="divider">または</div>
@@ -1191,6 +1256,14 @@ async function summarize() {
     }
 
     const data = await res.json();
+
+    // 日時を取得してセット
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('ja-JP', { year:'numeric', month:'long', day:'numeric', weekday:'short' });
+    const timeStr = now.toLocaleTimeString('ja-JP', { hour:'2-digit', minute:'2-digit' });
+    const datetimeText = `📅 ${dateStr} ${timeStr}`;
+    document.getElementById('result-datetime').textContent = datetimeText;
+
     document.getElementById('result-text').textContent = data.result;
     document.getElementById('theme-label-badge').textContent = THEMES[selectedTheme] || selectedTheme;
     showScreen('screen-result');
@@ -1205,8 +1278,14 @@ async function summarize() {
 // ─────────────────────────────────────────────
 // 共有
 // ─────────────────────────────────────────────
+function getShareText() {
+  const datetime = document.getElementById('result-datetime').textContent;
+  const result   = document.getElementById('result-text').textContent;
+  return datetime ? `${datetime}\n\n${result}` : result;
+}
+
 function copyResult() {
-  const text = document.getElementById('result-text').textContent;
+  const text = getShareText();
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(text)
       .then(() => showToast('✅ コピーしました！'))
@@ -1230,16 +1309,9 @@ function fallbackCopy(text) {
 }
 
 function shareToLine() {
-  const text = document.getElementById('result-text').textContent;
+  const text = getShareText();
   const url  = `https://line.me/R/msg/text/?${encodeURIComponent(text)}`;
   window.open(url, '_blank');
-}
-
-function shareToEmail() {
-  const text    = document.getElementById('result-text').textContent;
-  const subject = encodeURIComponent(`【ボイスみっけ】${THEMES[selectedTheme] || '記録'}`);
-  const body    = encodeURIComponent(text);
-  window.location.href = `mailto:?subject=${subject}&body=${body}`;
 }
 
 // ─────────────────────────────────────────────

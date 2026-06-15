@@ -623,7 +623,7 @@
       </div>
     </div>
 
-    <button class="btn btn-ghost btn-sm" onclick="showScreen('screen-record'); resumeRecording()">
+    <button class="btn btn-ghost btn-sm" onclick="backToRecording()">
       ← 録音に戻る
     </button>
   </div>
@@ -698,12 +698,13 @@ const THEMES = {
 // ─────────────────────────────────────────────
 // グローバル状態
 // ─────────────────────────────────────────────
-let recognition     = null;
-let isRecording     = false;
-let finalTranscript = '';
-let timerInterval   = null;
-let elapsedSeconds  = 0;
-let selectedTheme   = '';
+let recognition      = null;
+let isRecording      = false;
+let isPaused         = false;
+let finalTranscript  = '';
+let timerInterval    = null;
+let elapsedSeconds   = 0;
+let selectedTheme    = '';
 
 // ─────────────────────────────────────────────
 // トライアル管理
@@ -807,7 +808,7 @@ function showScreen(id) {
 }
 
 // ─────────────────────────────────────────────
-// 録音開始
+// 録音開始（新規）
 // ─────────────────────────────────────────────
 function startRecording() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -816,8 +817,10 @@ function startRecording() {
     return;
   }
 
+  // 完全リセット
   finalTranscript = '';
   elapsedSeconds  = 0;
+  isPaused        = false;
   isRecording     = true;
 
   document.getElementById('timer').textContent         = '00:00';
@@ -831,6 +834,12 @@ function startRecording() {
 }
 
 function setupRecognition() {
+  // 既存のrecognitionを破棄
+  if (recognition) {
+    try { recognition.abort(); } catch(_) {}
+    recognition = null;
+  }
+
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   recognition = new SR();
   recognition.lang            = 'ja-JP';
@@ -857,16 +866,19 @@ function setupRecognition() {
       alert('マイクへのアクセスが拒否されました。\nブラウザの設定でマイクを許可してからお試しください。');
       cancelRecording();
     }
+    // no-speech / network はそのまま続行
   };
 
+  // 自動停止後に再起動（長時間録音対応・pauseでない場合のみ）
   recognition.onend = () => {
-    if (isRecording) {
+    if (isRecording && !isPaused) {
       try { recognition.start(); } catch(_) {}
     }
   };
 }
 
 function startTimer() {
+  clearInterval(timerInterval);
   timerInterval = setInterval(() => {
     elapsedSeconds++;
     const m = String(Math.floor(elapsedSeconds / 60)).padStart(2, '0');
@@ -876,17 +888,24 @@ function startTimer() {
 }
 
 // ─────────────────────────────────────────────
-// 録音停止
+// 録音停止（→テーマ選択画面へ）
 // ─────────────────────────────────────────────
 function stopRecording() {
+  isPaused    = true;
   isRecording = false;
   clearInterval(timerInterval);
-  if (recognition) recognition.stop();
+  if (recognition) {
+    try { recognition.stop(); } catch(_) {}
+  }
 
   const text = finalTranscript.trim();
   if (!text) {
     showToast('音声が認識されませんでした。もう一度お試しください。');
-    showScreen('screen-top');
+    // 録音画面に留まって再開できるようにする
+    isPaused    = false;
+    isRecording = true;
+    startTimer();
+    try { recognition.start(); } catch(_) { setupRecognition(); recognition.start(); }
     return;
   }
 
@@ -897,18 +916,70 @@ function stopRecording() {
   showScreen('screen-transcript');
 }
 
+// ─────────────────────────────────────────────
+// 録音に戻る（テーマ選択画面 → 録音画面）
+// ─────────────────────────────────────────────
+function backToRecording() {
+  // 録音を再開する
+  isPaused    = false;
+  isRecording = true;
+
+  document.getElementById('final-text').textContent   = finalTranscript;
+  document.getElementById('interim-text').textContent = '';
+
+  showScreen('screen-record');
+  startTimer();
+
+  setupRecognition();
+  try {
+    recognition.start();
+  } catch(e) {
+    showToast('録音を再開できませんでした。マイク許可を確認してください。');
+  }
+}
+
+// ─────────────────────────────────────────────
+// キャンセル（トップへ戻る・全リセット）
+// ─────────────────────────────────────────────
 function cancelRecording() {
+  isPaused    = false;
   isRecording = false;
   clearInterval(timerInterval);
-  if (recognition) recognition.stop();
+  if (recognition) {
+    try { recognition.abort(); } catch(_) {}
+    recognition = null;
+  }
+  finalTranscript = '';
+  elapsedSeconds  = 0;
+  document.getElementById('timer').textContent         = '00:00';
+  document.getElementById('final-text').textContent    = '';
+  document.getElementById('interim-text').textContent  = '';
   showScreen('screen-top');
 }
 
-function resumeRecording() {}
-
 // ─────────────────────────────────────────────
-// テーマ選択
+// 全リセット（結果画面 → トップ）
 // ─────────────────────────────────────────────
+function resetAll() {
+  isPaused        = false;
+  isRecording     = false;
+  finalTranscript = '';
+  selectedTheme   = '';
+  elapsedSeconds  = 0;
+  clearInterval(timerInterval);
+  if (recognition) {
+    try { recognition.abort(); } catch(_) {}
+    recognition = null;
+  }
+  document.getElementById('transcript-text').value      = '';
+  document.getElementById('result-text').textContent    = '';
+  document.getElementById('timer').textContent          = '00:00';
+  document.getElementById('final-text').textContent     = '';
+  document.getElementById('interim-text').textContent   = '';
+  document.getElementById('btn-summarize').disabled     = true;
+  document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('selected'));
+  showScreen('screen-top');
+}
 function selectTheme(theme) {
   selectedTheme = theme;
   document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('selected'));
@@ -1009,20 +1080,6 @@ function shareToEmail() {
 // ─────────────────────────────────────────────
 // リセット
 // ─────────────────────────────────────────────
-function resetAll() {
-  finalTranscript = '';
-  selectedTheme   = '';
-  elapsedSeconds  = 0;
-  document.getElementById('transcript-text').value      = '';
-  document.getElementById('result-text').textContent    = '';
-  document.getElementById('timer').textContent          = '00:00';
-  document.getElementById('final-text').textContent     = '';
-  document.getElementById('interim-text').textContent   = '';
-  document.getElementById('btn-summarize').disabled     = true;
-  document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('selected'));
-  showScreen('screen-top');
-}
-
 // ─────────────────────────────────────────────
 // トースト通知
 // ─────────────────────────────────────────────

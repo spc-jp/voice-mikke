@@ -27,6 +27,11 @@
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
+  html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
     background: var(--bg);
@@ -35,6 +40,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    overflow-x: hidden;
   }
 
   /* ── ヘッダー ── */
@@ -54,15 +60,33 @@
     font-size: 1.2rem;
     font-weight: 700;
     letter-spacing: 0.03em;
+    flex: 1;
   }
   header .logo span { color: #60a5fa; }
+  .btn-howto {
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.15s;
+  }
+  .btn-howto:active { background: rgba(255,255,255,0.3); }
 
   /* ── 共通コンテナ ── */
   .container {
     width: 100%;
+    width: 100%;
     max-width: 480px;
+    min-width: 0;
     padding: 20px 16px 40px;
     flex: 1;
+    overflow-x: hidden;
   }
 
   /* ── スクリーン切替 ── */
@@ -72,6 +96,9 @@
     flex-direction: column;
     gap: 16px;
     animation: fadeUp 0.28s ease;
+    width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
   }
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(12px); }
@@ -255,17 +282,22 @@
   }
   .live-text-box {
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
     background: var(--bg);
     border-radius: 12px;
     padding: 14px;
-    min-height: 80px;
-    max-height: 180px;
-    overflow-y: auto;
+    min-height: 80px !important;
+    max-height: 180px !important;
+    height: 180px !important;
+    overflow: auto !important;
     font-size: 0.88rem;
     color: var(--text);
     line-height: 1.6;
     border: 1px solid var(--border);
     word-break: break-all;
+    overflow-wrap: break-word;
+    box-sizing: border-box;
   }
   #interim-text { color: var(--muted); font-style: italic; }
 
@@ -274,6 +306,8 @@
   /* ── ────────────────────── ── */
   textarea {
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
     height: 160px;
     max-height: 160px;
     border: 1px solid var(--border);
@@ -287,6 +321,10 @@
     line-height: 1.6;
     outline: none;
     overflow-y: auto;
+    overflow-x: hidden;
+    word-break: break-all;
+    overflow-wrap: break-word;
+    box-sizing: border-box;
     transition: border-color 0.2s;
   }
   textarea:focus { border-color: var(--blue); }
@@ -520,6 +558,7 @@
 <header>
   <span style="font-size:1.4rem">🎙️</span>
   <span class="logo">ボイス<span>みっけ</span></span>
+  <button class="btn-howto" onclick="showHowto()">使い方</button>
 </header>
 
 <div id="trial-banner" class="free">🎁 今なら3回まで無料でお試しいただけます（登録不要）</div>
@@ -541,10 +580,6 @@
       <button class="btn btn-primary btn-record-big" onclick="startRecording()">
         🎙️ 録音を開始する
       </button>
-    </div>
-    <div class="notice">
-      📌 <strong>ご利用の前に：</strong> マイクの使用許可が必要です。ブラウザから許可を求められた場合は「許可」を選択してください。<br>
-      推奨ブラウザ：Chrome（Android）/ Safari（iPhone）
     </div>
   </div>
 
@@ -677,6 +712,71 @@
 </div><!-- /container -->
 
 <div id="toast"></div>
+
+<!-- ======== 使い方モーダル ======== -->
+<div id="howto-overlay" onclick="closeHowto()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:200;"></div>
+<div id="howto-modal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:92%; max-width:460px; max-height:85vh; overflow-y:auto; background:#fff; border-radius:18px; padding:24px 20px; z-index:201; box-shadow:0 8px 40px rgba(0,0,0,0.2);">
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;">
+    <h2 style="font-size:1.1rem; color:#1e3a5f;">📖 ボイスみっけ 使い方</h2>
+    <button onclick="closeHowto()" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:#64748b; line-height:1;">×</button>
+  </div>
+
+  <div style="background:#eff6ff; border-radius:12px; padding:14px 16px; margin-bottom:18px;">
+    <p style="font-size:0.88rem; font-weight:700; color:#1e3a5f; margin-bottom:6px;">🎯 このアプリでできること</p>
+    <p style="font-size:0.86rem; color:#1e293b; line-height:1.7;">商談・会議・相談ごとをスマホで録音するだけで、AIが議事録・商談記録・対応メモなどに自動整理。そのままLINEやメールで共有できます。</p>
+  </div>
+
+  <p style="font-size:0.88rem; font-weight:700; color:#1e3a5f; margin-bottom:10px;">📋 使い方ステップ</p>
+  <ol style="padding-left:0; list-style:none; display:flex; flex-direction:column; gap:10px; margin-bottom:18px;">
+    <li style="display:flex; gap:12px; align-items:flex-start;">
+      <span style="background:#1e3a5f; color:#fff; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:700; flex-shrink:0;">1</span>
+      <div>
+        <p style="font-size:0.9rem; font-weight:700; color:#1e293b; margin-bottom:2px;">「録音を開始する」をタップ</p>
+        <p style="font-size:0.82rem; color:#64748b; line-height:1.5;">マイク許可を求められたら「許可」を選択してください。許可するとすぐに録音が始まります。</p>
+      </div>
+    </li>
+    <li style="display:flex; gap:12px; align-items:flex-start;">
+      <span style="background:#1e3a5f; color:#fff; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:700; flex-shrink:0;">2</span>
+      <div>
+        <p style="font-size:0.9rem; font-weight:700; color:#1e293b; margin-bottom:2px;">話す</p>
+        <p style="font-size:0.82rem; color:#64748b; line-height:1.5;">リアルタイムで文字起こしされます。長時間でも自動で録音を継続します。</p>
+      </div>
+    </li>
+    <li style="display:flex; gap:12px; align-items:flex-start;">
+      <span style="background:#1e3a5f; color:#fff; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:700; flex-shrink:0;">3</span>
+      <div>
+        <p style="font-size:0.9rem; font-weight:700; color:#1e293b; margin-bottom:2px;">「録音を停止して次へ」をタップ</p>
+        <p style="font-size:0.82rem; color:#64748b; line-height:1.5;">文字起こし内容を確認・編集できます。</p>
+      </div>
+    </li>
+    <li style="display:flex; gap:12px; align-items:flex-start;">
+      <span style="background:#1e3a5f; color:#fff; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:700; flex-shrink:0;">4</span>
+      <div>
+        <p style="font-size:0.9rem; font-weight:700; color:#1e293b; margin-bottom:2px;">整理テーマを選んで「AIで整理する」</p>
+        <p style="font-size:0.82rem; color:#64748b; line-height:1.5;">議事録・商談記録・お客様対応メモ・士業の相談メモ・アイデアメモの5種類から選べます。</p>
+      </div>
+    </li>
+    <li style="display:flex; gap:12px; align-items:flex-start;">
+      <span style="background:#1e3a5f; color:#fff; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:700; flex-shrink:0;">5</span>
+      <div>
+        <p style="font-size:0.9rem; font-weight:700; color:#1e293b; margin-bottom:2px;">コピー・LINEで共有</p>
+        <p style="font-size:0.82rem; color:#64748b; line-height:1.5;">整理結果をコピーしてLINEやメールにすぐ貼り付けられます。</p>
+      </div>
+    </li>
+  </ol>
+
+  <div style="background:#fff7ed; border:1px solid #fed7aa; border-radius:10px; padding:12px 14px; margin-bottom:18px;">
+    <p style="font-size:0.82rem; color:#9a3412; line-height:1.6;">
+      📌 <strong>ご利用の前に</strong><br>
+      マイクの使用許可が必要です。ブラウザから許可を求められた場合は「許可」を選択してください。<br>
+      推奨ブラウザ：Chrome（Android）/ Safari（iPhone）
+    </p>
+  </div>
+
+  <button onclick="closeHowto()" style="width:100%; padding:14px; background:#1e3a5f; color:#fff; border:none; border-radius:12px; font-size:1rem; font-weight:700; cursor:pointer;">
+    閉じる
+  </button>
+</div>
 
 <script>
 // ─────────────────────────────────────────────
@@ -1088,6 +1188,20 @@ function shareToEmail() {
 // ─────────────────────────────────────────────
 // リセット
 // ─────────────────────────────────────────────
+// ─────────────────────────────────────────────
+// 使い方モーダル
+// ─────────────────────────────────────────────
+function showHowto() {
+  document.getElementById('howto-overlay').style.display = 'block';
+  document.getElementById('howto-modal').style.display   = 'block';
+  document.body.style.overflow = 'hidden';
+}
+function closeHowto() {
+  document.getElementById('howto-overlay').style.display = 'none';
+  document.getElementById('howto-modal').style.display   = 'none';
+  document.body.style.overflow = '';
+}
+
 // ─────────────────────────────────────────────
 // トースト通知
 // ─────────────────────────────────────────────

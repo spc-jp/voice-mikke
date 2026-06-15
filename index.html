@@ -397,6 +397,87 @@
     background: var(--border);
   }
 
+  /* ── トライアルバナー ── */
+  #trial-banner {
+    width: 100%;
+    padding: 10px 16px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: center;
+    line-height: 1.5;
+    position: sticky;
+    top: 52px;
+    z-index: 90;
+  }
+  #trial-banner.free {
+    background: #ecfdf5;
+    color: #065f46;
+    border-bottom: 1px solid #6ee7b7;
+  }
+  #trial-banner.warn {
+    background: #fff7ed;
+    color: #9a3412;
+    border-bottom: 1px solid #fed7aa;
+  }
+  #trial-banner.over {
+    background: #fee2e2;
+    color: #991b1b;
+    border-bottom: 1px solid #fca5a5;
+  }
+
+  /* ── パスワード解除カード ── */
+  .unlock-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 24px 18px;
+    box-shadow: var(--shadow);
+    border: 2px solid #fca5a5;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .unlock-card h3 { color: var(--red); }
+  .unlock-card p { font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
+  .unlock-input-row {
+    display: flex;
+    gap: 8px;
+  }
+  .unlock-input-row input {
+    flex: 1;
+    padding: 12px 14px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.18s;
+  }
+  .unlock-input-row input:focus { border-color: var(--blue); }
+  .btn-unlock {
+    background: var(--navy);
+    color: var(--white);
+    border: none;
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .btn-note {
+    background: #41c9b4;
+    color: var(--white);
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    width: 100%;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+  }
+
   /* ── トースト ── */
   #toast {
     position: fixed;
@@ -436,7 +517,7 @@
   <span class="logo">ボイス<span>みっけ</span></span>
 </header>
 
-<div class="container">
+<div id="trial-banner" class="free">🎁 今なら3回まで無料でお試しいただけます（登録不要）</div>
 
   <!-- ======== スクリーン1: トップ ======== -->
   <div id="screen-top" class="screen active">
@@ -526,6 +607,22 @@
     <button class="btn btn-navy" id="btn-summarize" onclick="summarize()" disabled>
       ✨ AIで整理する
     </button>
+
+    <!-- 無料体験終了時のみ表示 -->
+    <div id="unlock-section" style="display:none;">
+      <div class="unlock-card">
+        <h3>⚠️ 無料体験が終了しました</h3>
+        <p>引き続きご利用いただくには、note有料記事をご購入ください。記事内に記載のパスワードを入力すると、無制限でお使いいただけます。</p>
+        <a class="btn-note" href="https://note.com/_yoshibon" target="_blank" rel="noopener">
+          📝 note有料記事でパスワードを入手する（¥980）
+        </a>
+        <div class="unlock-input-row">
+          <input type="password" id="pw-input" placeholder="パスワードを入力">
+          <button class="btn-unlock" onclick="unlockApp()">解除</button>
+        </div>
+      </div>
+    </div>
+
     <button class="btn btn-ghost btn-sm" onclick="showScreen('screen-record'); resumeRecording()">
       ← 録音に戻る
     </button>
@@ -578,9 +675,14 @@
 
 <script>
 // ─────────────────────────────────────────────
-// 設定：Cloudflare WorkerのURLをここに入力
+// 設定
 // ─────────────────────────────────────────────
-const WORKER_URL = 'https://voice-mikke.yymmatsu.workers.dev';
+const WORKER_URL   = 'https://voice-mikke.yymmatsu.workers.dev';
+const TRIAL_LIMIT  = 3;
+const UNLOCK_PASS  = 'Voice-2025';           // ← noteに記載するパスワード
+const NOTE_URL     = 'https://note.com/_yoshibon'; // ← 有料記事URL（後で変更可）
+const LS_COUNT     = 'voicemikke_trial_count';
+const LS_UNLOCKED  = 'voicemikke_unlocked';
 
 // ─────────────────────────────────────────────
 // テーマ定義
@@ -596,12 +698,85 @@ const THEMES = {
 // ─────────────────────────────────────────────
 // グローバル状態
 // ─────────────────────────────────────────────
-let recognition    = null;
-let isRecording    = false;
+let recognition     = null;
+let isRecording     = false;
 let finalTranscript = '';
-let timerInterval  = null;
-let elapsedSeconds = 0;
-let selectedTheme  = '';
+let timerInterval   = null;
+let elapsedSeconds  = 0;
+let selectedTheme   = '';
+
+// ─────────────────────────────────────────────
+// トライアル管理
+// ─────────────────────────────────────────────
+function isUnlocked() {
+  return localStorage.getItem(LS_UNLOCKED) === '1';
+}
+
+function getTrialCount() {
+  return parseInt(localStorage.getItem(LS_COUNT) || '0', 10);
+}
+
+function incrementTrial() {
+  const n = getTrialCount() + 1;
+  localStorage.setItem(LS_COUNT, n);
+  return n;
+}
+
+function updateTrialBanner() {
+  const banner = document.getElementById('trial-banner');
+  if (isUnlocked()) {
+    banner.style.display = 'none';
+    return;
+  }
+  const used = getTrialCount();
+  const left = TRIAL_LIMIT - used;
+  banner.style.display = 'block';
+  if (used === 0) {
+    banner.className = 'free';
+    banner.textContent = '🎁 今なら3回まで無料でお試しいただけます（登録不要）';
+  } else if (left > 0) {
+    banner.className = 'warn';
+    banner.textContent = `🎁 無料体験 残り${left}回（全${TRIAL_LIMIT}回）`;
+  } else {
+    banner.className = 'over';
+    banner.textContent = '⚠️ 無料体験が終了しました　→ note有料記事でパスワードを入手';
+  }
+}
+
+function checkTrialLimit() {
+  if (isUnlocked()) return true;
+  return getTrialCount() < TRIAL_LIMIT;
+}
+
+function showUnlockSection() {
+  document.getElementById('btn-summarize').style.display = 'none';
+  document.getElementById('unlock-section').style.display = 'block';
+  // noteリンクを最新URLに更新
+  document.querySelector('.btn-note').href = NOTE_URL;
+}
+
+function hideUnlockSection() {
+  document.getElementById('btn-summarize').style.display = 'flex';
+  document.getElementById('unlock-section').style.display = 'none';
+}
+
+function unlockApp() {
+  const input = document.getElementById('pw-input').value.trim();
+  if (input === UNLOCK_PASS) {
+    localStorage.setItem(LS_UNLOCKED, '1');
+    showToast('🎉 解除しました！これからは無制限でご利用いただけます');
+    hideUnlockSection();
+    updateTrialBanner();
+    // 整理ボタンが選択済みなら有効化
+    if (selectedTheme) {
+      document.getElementById('btn-summarize').disabled = false;
+    }
+  } else {
+    showToast('❌ パスワードが違います');
+    document.getElementById('pw-input').value = '';
+    document.getElementById('pw-input').focus();
+  }
+}
 
 // ─────────────────────────────────────────────
 // 初期化
@@ -611,6 +786,7 @@ let selectedTheme  = '';
   if (!SR) {
     document.getElementById('compat-banner').style.display = 'block';
   }
+  updateTrialBanner();
 })();
 
 // ─────────────────────────────────────────────
@@ -620,6 +796,14 @@ function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
+  // テーマ画面に来るたびにトライアル状態を更新
+  if (id === 'screen-transcript') {
+    if (!checkTrialLimit()) {
+      showUnlockSection();
+    } else {
+      hideUnlockSection();
+    }
+  }
 }
 
 // ─────────────────────────────────────────────
@@ -636,10 +820,9 @@ function startRecording() {
   elapsedSeconds  = 0;
   isRecording     = true;
 
-  // UIリセット
-  document.getElementById('timer').textContent    = '00:00';
-  document.getElementById('final-text').textContent  = '';
-  document.getElementById('interim-text').textContent = '';
+  document.getElementById('timer').textContent         = '00:00';
+  document.getElementById('final-text').textContent    = '';
+  document.getElementById('interim-text').textContent  = '';
 
   setupRecognition();
   recognition.start();
@@ -674,10 +857,8 @@ function setupRecognition() {
       alert('マイクへのアクセスが拒否されました。\nブラウザの設定でマイクを許可してからお試しください。');
       cancelRecording();
     }
-    // no-speech / network はそのまま続行
   };
 
-  // 自動停止後に再起動（長時間録音対応）
   recognition.onend = () => {
     if (isRecording) {
       try { recognition.start(); } catch(_) {}
@@ -723,9 +904,7 @@ function cancelRecording() {
   showScreen('screen-top');
 }
 
-function resumeRecording() {
-  // 録音画面に戻るが録音は再開しない（確認済みのケースのみ）
-}
+function resumeRecording() {}
 
 // ─────────────────────────────────────────────
 // テーマ選択
@@ -734,21 +913,31 @@ function selectTheme(theme) {
   selectedTheme = theme;
   document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('selected'));
   document.querySelector(`.theme-card[data-theme="${theme}"]`).classList.add('selected');
-  document.getElementById('btn-summarize').disabled = false;
+  // 解除済み or 残回数あり の場合のみ整理ボタンを有効化
+  if (checkTrialLimit()) {
+    document.getElementById('btn-summarize').disabled = false;
+  }
 }
 
 // ─────────────────────────────────────────────
 // AI整理（Cloudflare Worker → Claude API）
 // ─────────────────────────────────────────────
 async function summarize() {
-  const text = document.getElementById('transcript-text').value.trim();
-  if (!text) {
-    showToast('テキストが空です。');
+  // トライアルチェック
+  if (!checkTrialLimit()) {
+    showUnlockSection();
+    showToast('無料体験が終了しました。パスワードを入力してください。');
     return;
   }
-  if (!selectedTheme) {
-    showToast('テーマを選んでください。');
-    return;
+
+  const text = document.getElementById('transcript-text').value.trim();
+  if (!text) { showToast('テキストが空です。'); return; }
+  if (!selectedTheme) { showToast('テーマを選んでください。'); return; }
+
+  // カウントアップ（解除済みの場合はカウントしない）
+  if (!isUnlocked()) {
+    incrementTrial();
+    updateTrialBanner();
   }
 
   showScreen('screen-loading');
@@ -824,12 +1013,12 @@ function resetAll() {
   finalTranscript = '';
   selectedTheme   = '';
   elapsedSeconds  = 0;
-  document.getElementById('transcript-text').value       = '';
-  document.getElementById('result-text').textContent     = '';
-  document.getElementById('timer').textContent           = '00:00';
-  document.getElementById('final-text').textContent      = '';
-  document.getElementById('interim-text').textContent    = '';
-  document.getElementById('btn-summarize').disabled      = true;
+  document.getElementById('transcript-text').value      = '';
+  document.getElementById('result-text').textContent    = '';
+  document.getElementById('timer').textContent          = '00:00';
+  document.getElementById('final-text').textContent     = '';
+  document.getElementById('interim-text').textContent   = '';
+  document.getElementById('btn-summarize').disabled     = true;
   document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('selected'));
   showScreen('screen-top');
 }
@@ -844,5 +1033,6 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2400);
 }
 </script>
+
 </body>
 </html>

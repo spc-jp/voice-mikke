@@ -5,6 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ボイスみっけ｜録音して、すぐ整理</title>
 <meta name="description" content="商談・会議・相談をスマホで録音して、テーマ別にAIが自動整理。議事録・商談記録・お客様対応メモがすぐ作れます。">
+<meta property="og:title" content="ボイスみっけ｜録音して、すぐ整理">
+<meta property="og:description" content="商談・会議・相談をスマホで録音するだけ。議事録・商談記録・対応メモに自動整理してLINEでそのまま共有できます。">
+<meta property="og:image" content="https://spc-jp.github.io/voice-mikke/ogp.png">
+<meta property="og:url" content="https://spc-jp.github.io/voice-mikke/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ボイスみっけ">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ボイスみっけ｜録音して、すぐ整理">
+<meta name="twitter:description" content="商談・会議・相談をスマホで録音するだけ。議事録・商談記録・対応メモに自動整理してLINEでそのまま共有できます。">
+<meta name="twitter:image" content="https://spc-jp.github.io/voice-mikke/ogp.png">
 <meta name="theme-color" content="#1e3a5f">
 <link rel="icon" type="image/png" href="https://spc-jp.github.io/voice-mikke/favicon.png">
 <link rel="apple-touch-icon" href="https://spc-jp.github.io/voice-mikke/favicon.png">
@@ -717,12 +727,15 @@
       <div class="unlock-card">
         <h3>⚠️ 無料体験が終了しました</h3>
         <p>引き続きご利用いただくには、note有料記事をご購入ください。記事内に記載のパスワードを入力すると、無制限でお使いいただけます。</p>
-        <a class="btn-note" href="https://note.com/_yoshibon" target="_blank" rel="noopener">
-          📝 note有料記事でパスワードを入手する（¥980）
+        <a class="btn-note" href="https://note.com/_yoshibon/n/nbfa4864823d3" target="_blank" rel="noopener" onclick="showPwInput()">
+          📝 noteでパスワードを入手する（¥980）
         </a>
-        <div class="unlock-input-row">
-          <input type="password" id="pw-input" placeholder="パスワードを入力">
-          <button class="btn-unlock" onclick="unlockApp()">解除</button>
+        <div id="pw-input-area" style="display:none;">
+          <p style="font-size:0.82rem; color:var(--muted); margin-bottom:8px;">購入後、記事内のパスワードを入力してください。</p>
+          <div class="unlock-input-row">
+            <input type="password" id="pw-input" placeholder="パスワードを入力">
+            <button class="btn-unlock" onclick="unlockApp()">解除</button>
+          </div>
         </div>
       </div>
     </div>
@@ -856,7 +869,7 @@
 const WORKER_URL   = 'https://voice-mikke.yymmatsu.workers.dev';
 const TRIAL_LIMIT  = 3;
 const UNLOCK_PASS  = 'Voice-2025';           // ← noteに記載するパスワード
-const NOTE_URL     = 'https://note.com/_yoshibon'; // ← 有料記事URL（後で変更可）
+const NOTE_URL     = 'https://note.com/_yoshibon/n/nbfa4864823d3';
 const LS_COUNT     = 'voicemikke_trial_count';
 const LS_UNLOCKED  = 'voicemikke_unlocked';
 
@@ -935,6 +948,12 @@ function showUnlockSection() {
 function hideUnlockSection() {
   document.getElementById('btn-summarize').style.display = 'flex';
   document.getElementById('unlock-section').style.display = 'none';
+}
+
+function showPwInput() {
+  setTimeout(() => {
+    document.getElementById('pw-input-area').style.display = 'block';
+  }, 400);
 }
 
 function unlockApp() {

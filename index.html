@@ -590,6 +590,45 @@
     display: block;
   }
 
+  /* ── 言語選択画面 ── */
+  .lang-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+  .lang-card {
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 8px;
+    cursor: pointer;
+    background: var(--white);
+    text-align: center;
+    transition: border-color 0.18s, background 0.18s;
+    -webkit-tap-highlight-color: transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .lang-card .lang-flag { font-size: 1.8rem; line-height: 1; }
+  .lang-card .lang-name { font-size: 0.78rem; font-weight: 700; color: var(--text); }
+  .lang-card .lang-sub  { font-size: 0.7rem; color: var(--muted); }
+  .lang-card.selected {
+    border-color: var(--blue);
+    background: var(--blue-l);
+    position: relative;
+  }
+  .lang-card.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 5px;
+    right: 8px;
+    color: var(--blue);
+    font-weight: 800;
+    font-size: 0.85rem;
+  }
+
   /* ── トースト ── */
   #toast {
     position: fixed;
@@ -642,14 +681,61 @@
       <h1>録音して、<br><span>すぐ整理。</span></h1>
       <p>商談・会議・相談をスマホで録音。<br>AIがテーマに合わせて自動整理します。</p>
       <ul class="feature-list">
-        <li><span class="icon">📝</span><span>議事録・商談記録・士業メモなど5テーマ対応</span></li>
+        <li><span class="icon">📝</span><span>議事録・商談記録・越境会議など6テーマ対応</span></li>
+        <li><span class="icon">🌐</span><span>日本語・英語・韓国語・中国語に対応</span></li>
         <li><span class="icon">⚡</span><span>録音→整理→共有がスマホ1台で完結</span></li>
-        <li><span class="icon">💬</span><span>LINEやメールにワンタップで送信</span></li>
+        <li><span class="icon">💬</span><span>LINEにワンタップで送信</span></li>
       </ul>
-      <button class="btn btn-primary btn-record-big" onclick="startRecording()">
+      <button class="btn btn-primary btn-record-big" onclick="showLangSelect()">
         🎙️ 録音を開始する
       </button>
     </div>
+  </div>
+
+  <!-- ======== スクリーン1.5: 言語選択 ======== -->
+  <div id="screen-lang" class="screen">
+    <div class="card">
+      <h3 style="margin-bottom:6px;">🌐 録音する言語を選んでください</h3>
+      <p style="font-size:0.84rem; color:var(--muted); margin-bottom:16px;">「自動」は日本語メインの場合におすすめです</p>
+      <div class="lang-grid">
+        <div class="lang-card selected" data-lang="ja-JP" onclick="selectLang('ja-JP', this)">
+          <span class="lang-flag">🌐</span>
+          <span class="lang-name">自動</span>
+          <span class="lang-sub">Auto</span>
+        </div>
+        <div class="lang-card" data-lang="ja-JP" onclick="selectLang('ja-JP', this)">
+          <span class="lang-flag">🇯🇵</span>
+          <span class="lang-name">日本語</span>
+          <span class="lang-sub">Japanese</span>
+        </div>
+        <div class="lang-card" data-lang="en-US" onclick="selectLang('en-US', this)">
+          <span class="lang-flag">🇺🇸</span>
+          <span class="lang-name">英語</span>
+          <span class="lang-sub">English</span>
+        </div>
+        <div class="lang-card" data-lang="ko-KR" onclick="selectLang('ko-KR', this)">
+          <span class="lang-flag">🇰🇷</span>
+          <span class="lang-name">韓国語</span>
+          <span class="lang-sub">Korean</span>
+        </div>
+        <div class="lang-card" data-lang="zh-CN" onclick="selectLang('zh-CN', this)">
+          <span class="lang-flag">🇨🇳</span>
+          <span class="lang-name">中国語</span>
+          <span class="lang-sub">Chinese</span>
+        </div>
+        <div class="lang-card" data-lang="zh-TW" onclick="selectLang('zh-TW', this)">
+          <span class="lang-flag">🇹🇼</span>
+          <span class="lang-name">繁体字</span>
+          <span class="lang-sub">Traditional</span>
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-record-big" id="btn-start-with-lang" onclick="startRecording()">
+      🎙️ この言語で録音開始
+    </button>
+    <button class="btn btn-ghost btn-sm" onclick="showScreen('screen-top')">
+      ← 戻る
+    </button>
   </div>
 
   <!-- ======== スクリーン2: 録音中 ======== -->
@@ -712,9 +798,13 @@
           <span class="t-icon">⚖️</span>
           <span class="t-name">士業の相談メモ</span>
         </div>
-        <div class="theme-card" data-theme="idea" onclick="selectTheme('idea')" style="grid-column: 1 / -1;">
+        <div class="theme-card" data-theme="idea" onclick="selectTheme('idea')">
           <span class="t-icon">💡</span>
           <span class="t-name">アイデア・開発メモ</span>
+        </div>
+        <div class="theme-card" data-theme="global" onclick="selectTheme('global')" style="grid-column: 1 / -1; background: linear-gradient(135deg, #eff6ff, #f0fdf4);">
+          <span class="t-icon">🌐</span>
+          <span class="t-name">越境会議・多言語ミーティング</span>
         </div>
       </div>
     </div>
@@ -882,6 +972,7 @@ const THEMES = {
   customer: 'お客様対応メモ',
   shigyou:  '士業の相談メモ',
   idea:     'アイデア・開発メモ',
+  global:   '越境会議・多言語',
 };
 
 // ─────────────────────────────────────────────
@@ -894,6 +985,7 @@ let finalTranscript  = '';
 let timerInterval    = null;
 let elapsedSeconds   = 0;
 let selectedTheme    = '';
+let selectedLang     = 'ja-JP'; // デフォルト：日本語
 
 // ─────────────────────────────────────────────
 // トライアル管理
@@ -1003,6 +1095,22 @@ function showScreen(id) {
 }
 
 // ─────────────────────────────────────────────
+// 言語選択
+// ─────────────────────────────────────────────
+function showLangSelect() {
+  showScreen('screen-lang');
+}
+
+function selectLang(lang, el) {
+  selectedLang = lang;
+  document.querySelectorAll('.lang-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  // ボタンラベルを選択した言語名に更新
+  const name = el.querySelector('.lang-name').textContent;
+  document.getElementById('btn-start-with-lang').textContent = `🎙️ ${name}で録音開始`;
+}
+
+// ─────────────────────────────────────────────
 // 録音開始（新規）
 // ─────────────────────────────────────────────
 function startRecording() {
@@ -1045,7 +1153,7 @@ function setupRecognition() {
 
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   recognition = new SR();
-  recognition.lang            = 'ja-JP';
+  recognition.lang            = selectedLang;
   recognition.continuous      = true;
   recognition.interimResults  = true;
   recognition.maxAlternatives = 1;

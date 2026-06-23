@@ -1,324 +1,1473 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ボイスみっけ｜ご購入ありがとうございます</title>
-  <style>
-    :root {
-      --navy: #1e3a5f;
-      --blue: #1A7FA8;
-      --light: #EBF7FC;
-      --white: #ffffff;
-      --text: #1e293b;
-      --muted: #64748b;
-      --border: #e2e8f0;
-      --green: #059669;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
-      background: linear-gradient(135deg, #EBF7FC 0%, #ffffff 100%);
-      min-height: 100vh;
-      color: var(--text);
-    }
-    header {
-      background: var(--navy);
-      color: var(--white);
-      padding: 14px 20px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    header .logo { font-size: 1.1rem; font-weight: 700; }
-    header .logo span { color: #60a5fa; }
-    header .tagline { font-size: 0.75rem; color: rgba(255,255,255,0.6); margin-left: auto; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ボイスみっけ｜録音して、すぐ整理</title>
+<meta name="description" content="商談・会議・相談をスマホで録音して、テーマ別にAIが自動整理。議事録・商談記録・お客様対応メモがすぐ作れます。">
+<meta property="og:title" content="ボイスみっけ｜録音して、すぐ整理">
+<meta property="og:description" content="商談・会議・相談をスマホで録音するだけ。議事録・商談記録・対応メモに自動整理してLINEでそのまま共有できます。">
+<meta property="og:image" content="https://spc-jp.github.io/voice-mikke/ogp.png">
+<meta property="og:url" content="https://spc-jp.github.io/voice-mikke/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ボイスみっけ">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ボイスみっけ｜録音して、すぐ整理">
+<meta name="twitter:description" content="商談・会議・相談をスマホで録音するだけ。議事録・商談記録・対応メモに自動整理してLINEでそのまま共有できます。">
+<meta name="twitter:image" content="https://spc-jp.github.io/voice-mikke/ogp.png">
+<meta name="theme-color" content="#1e3a5f">
+<link rel="icon" type="image/png" href="https://spc-jp.github.io/voice-mikke/favicon.png">
+<link rel="apple-touch-icon" href="https://spc-jp.github.io/voice-mikke/favicon.png">
+<style>
+  :root {
+    --navy:      #1e3a5f;
+    --navy-2:    #2d5282;
+    --blue:      #2563eb;
+    --blue-l:    #dbeafe;
+    --bg:        #f0f4f8;
+    --white:     #ffffff;
+    --text:      #1e293b;
+    --muted:     #64748b;
+    --border:    #cbd5e1;
+    --red:       #dc2626;
+    --red-l:     #fee2e2;
+    --green:     #16a34a;
+    --radius:    14px;
+    --shadow:    0 4px 20px rgba(0,0,0,0.10);
+  }
 
-    .container {
-      max-width: 480px;
-      margin: 0 auto;
-      padding: 24px 16px 60px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    .hero-card {
-      background: var(--white);
-      border-radius: 16px;
-      padding: 28px 20px;
-      text-align: center;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-      border-top: 4px solid var(--blue);
-    }
-    .hero-card .check { font-size: 3rem; margin-bottom: 12px; }
-    .hero-card h1 { font-size: 1.2rem; color: var(--navy); margin-bottom: 8px; line-height: 1.5; }
-    .hero-card p { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+  html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
 
-    .card {
-      background: var(--white);
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-    }
-    .card h2 {
-      font-size: 0.95rem;
-      color: var(--navy);
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+  }
 
-    /* アクセス情報 */
-    .info-row {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .info-item {
-      background: var(--light);
-      border-radius: 10px;
-      padding: 14px 16px;
-    }
-    .info-item .label {
-      font-size: 0.75rem;
-      color: var(--blue);
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-    .info-item .value-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .info-item .value {
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--navy);
-      flex: 1;
-      word-break: break-all;
-    }
-    .btn-copy {
-      background: var(--navy);
-      color: var(--white);
-      border: none;
-      border-radius: 8px;
-      padding: 8px 14px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: background 0.15s;
-    }
-    .btn-copy:active { background: var(--blue); }
+  /* ── ヘッダー ── */
+  header {
+    width: 100%;
+    background: var(--navy);
+    color: var(--white);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  header .logo {
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    flex: 1;
+  }
+  header .logo span { color: #60a5fa; }
+  .btn-howto {
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.15s;
+  }
+  .btn-howto:active { background: rgba(255,255,255,0.3); }
 
-    /* アプリを開くボタン */
-    .btn-open {
-      display: block;
-      width: 100%;
-      padding: 16px;
-      background: linear-gradient(135deg, var(--navy), var(--blue));
-      color: var(--white);
-      border: none;
-      border-radius: 12px;
-      font-size: 1rem;
-      font-weight: 700;
-      text-align: center;
-      text-decoration: none;
-      cursor: pointer;
-      margin-top: 16px;
-    }
+  /* ── 共通コンテナ ── */
+  .container {
+    width: 100%;
+    max-width: 480px;
+    min-width: 0;
+    padding: 20px 16px 40px;
+    flex: 1;
+    overflow-x: hidden;
+  }
 
-    /* QRコード */
-    .qr-wrap {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      padding: 16px 0 8px;
-    }
-    .qr-wrap img { border-radius: 10px; border: 4px solid var(--light); }
-    .qr-wrap p { font-size: 0.8rem; color: var(--muted); text-align: center; }
+  /* ── スクリーン切替 ── */
+  .screen { display: none; }
+  .screen.active {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    animation: fadeUp 0.28s ease;
+    width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
 
-    /* 使い方ステップ */
-    .steps { display: flex; flex-direction: column; gap: 12px; }
-    .step { display: flex; gap: 12px; align-items: flex-start; }
-    .step-num {
-      background: var(--navy);
-      color: var(--white);
-      border-radius: 50%;
-      width: 26px;
-      height: 26px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.8rem;
-      font-weight: 700;
-      flex-shrink: 0;
-    }
-    .step-text { font-size: 0.88rem; line-height: 1.6; color: var(--text); padding-top: 3px; }
+  /* ── カード ── */
+  .card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 22px 18px;
+    box-shadow: var(--shadow);
+  }
 
-    /* 注意事項 */
-    .notice {
-      background: #fff7ed;
-      border: 1px solid #fed7aa;
-      border-radius: 10px;
-      padding: 14px 16px;
-      font-size: 0.82rem;
-      color: #9a3412;
-      line-height: 1.7;
-    }
+  /* ── ボタン ── */
+  .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.12s, opacity 0.12s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn:active { transform: scale(0.97); opacity: 0.88; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-primary { background: var(--blue); color: var(--white); }
+  .btn-navy    { background: var(--navy); color: var(--white); }
+  .btn-ghost   { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
+  .btn-red     { background: var(--red); color: var(--white); }
+  .btn-orange  { background: #ea7000; color: var(--white); }
+  .btn-green   { background: var(--green); color: var(--white); }
+  .btn-line    { background: #06c755; color: var(--white); }
+  .btn-sm      { padding: 12px; font-size: 0.9rem; }
 
-    /* フッター */
-    footer {
-      text-align: center;
-      font-size: 0.75rem;
-      color: var(--muted);
-      padding: 20px 16px;
-      line-height: 1.8;
-    }
-    footer a { color: var(--blue); text-decoration: none; }
+  /* ── タイトル ── */
+  h2 { font-size: 1.25rem; font-weight: 700; color: var(--navy); }
+  h3 { font-size: 1rem; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+  p  { font-size: 0.92rem; color: var(--muted); line-height: 1.6; }
 
-    /* トースト */
-    #toast {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%) translateY(80px);
-      background: #1e293b;
-      color: var(--white);
-      padding: 10px 20px;
-      border-radius: 20px;
-      font-size: 0.88rem;
-      font-weight: 600;
-      transition: transform 0.3s;
-      z-index: 100;
-      white-space: nowrap;
-    }
-    #toast.show { transform: translateX(-50%) translateY(0); }
-  </style>
+  /* ── ────────────────────── ── */
+  /* スクリーン 1: トップ */
+  /* ── ────────────────────── ── */
+  .hero {
+    text-align: center;
+    padding: 30px 20px 24px;
+  }
+  .hero-icon {
+    font-size: 3.5rem;
+    margin-bottom: 12px;
+    display: block;
+  }
+  .hero h1 {
+    font-size: 1.7rem;
+    font-weight: 800;
+    color: var(--navy);
+    line-height: 1.3;
+    margin-bottom: 10px;
+  }
+  .hero h1 span { color: var(--blue); }
+  .hero p {
+    font-size: 0.95rem;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+  .feature-list {
+    list-style: none;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+  .feature-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 0.9rem;
+    color: var(--text);
+  }
+  .feature-list li .icon {
+    background: var(--blue-l);
+    color: var(--blue);
+    border-radius: 8px;
+    padding: 4px 8px;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+  .notice {
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 0.82rem;
+    color: #9a3412;
+    line-height: 1.5;
+  }
+  .btn-record-big {
+    font-size: 1.15rem;
+    padding: 20px;
+    border-radius: 16px;
+  }
+
+  /* ── ────────────────────── ── */
+  /* スクリーン 2: 録音中 */
+  /* ── ────────────────────── ── */
+  .record-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    padding: 30px 0 10px;
+  }
+  .pulse-wrapper {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .pulse-ring {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: rgba(220, 38, 38, 0.2);
+    animation: pulse 1.4s ease-out infinite;
+  }
+  .pulse-ring:nth-child(2) { animation-delay: 0.5s; }
+  @keyframes pulse {
+    0%   { transform: scale(0.7); opacity: 0.8; }
+    100% { transform: scale(1.3); opacity: 0; }
+  }
+  .mic-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--red);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    box-shadow: 0 4px 16px rgba(220,38,38,0.4);
+    position: relative;
+    z-index: 1;
+  }
+  .rec-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--red-l);
+    color: var(--red);
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+  .rec-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--red);
+    animation: blink 0.9s ease-in-out infinite;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.2; }
+  }
+  .timer {
+    font-size: 2.8rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    color: var(--navy);
+    letter-spacing: 0.05em;
+  }
+  .live-text-box {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 14px;
+    min-height: 80px !important;
+    max-height: 180px !important;
+    height: 180px !important;
+    overflow: auto !important;
+    font-size: 0.88rem;
+    color: var(--text);
+    line-height: 1.6;
+    border: 1px solid var(--border);
+    word-break: break-all;
+    overflow-wrap: break-word;
+    box-sizing: border-box;
+  }
+  #interim-text { color: var(--muted); font-style: italic; }
+
+  /* ── ────────────────────── ── */
+  /* スクリーン 3: 確認・テーマ選択 */
+  /* ── ────────────────────── ── */
+  textarea {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    height: 160px;
+    max-height: 160px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    color: var(--text);
+    resize: none;
+    background: var(--white);
+    line-height: 1.6;
+    outline: none;
+    overflow-y: auto;
+    overflow-x: hidden;
+    word-break: break-all;
+    overflow-wrap: break-word;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+  }
+  textarea:focus { border-color: var(--blue); }
+
+  .theme-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .theme-card {
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 12px;
+    cursor: pointer;
+    background: var(--white);
+    transition: border-color 0.18s, background 0.18s, transform 0.12s;
+    text-align: center;
+    -webkit-tap-highlight-color: transparent;
+    min-height: 76px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .theme-card:active { transform: scale(0.96); }
+  .theme-card.selected {
+    border-color: var(--blue);
+    background: var(--blue-l);
+    position: relative;
+  }
+  .theme-card.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    color: var(--blue);
+    font-weight: 800;
+    font-size: 1rem;
+  }
+  .theme-card .t-icon { font-size: 1.6rem; margin-bottom: 6px; display: block; }
+  .theme-card .t-name { font-size: 0.82rem; font-weight: 700; color: var(--navy); display: block; }
+  .theme-card.selected .t-name { color: var(--blue); }
+
+  /* ── ────────────────────── ── */
+  /* スクリーン 4: 処理中 */
+  /* ── ────────────────────── ── */
+  .loading-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+    padding: 60px 20px;
+    text-align: center;
+    min-height: 320px;
+    justify-content: center;
+  }
+
+  /* 音波アニメーション */
+  .soundwave {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    height: 56px;
+  }
+  .soundwave span {
+    display: block;
+    width: 5px;
+    border-radius: 10px;
+    background: linear-gradient(180deg, #60a5fa, #1e3a5f);
+    animation: wave 1.2s ease-in-out infinite;
+  }
+  .soundwave span:nth-child(1)  { height: 16px; animation-delay: 0s;    }
+  .soundwave span:nth-child(2)  { height: 32px; animation-delay: 0.1s;  }
+  .soundwave span:nth-child(3)  { height: 48px; animation-delay: 0.2s;  }
+  .soundwave span:nth-child(4)  { height: 56px; animation-delay: 0.3s;  }
+  .soundwave span:nth-child(5)  { height: 40px; animation-delay: 0.4s;  }
+  .soundwave span:nth-child(6)  { height: 56px; animation-delay: 0.3s;  }
+  .soundwave span:nth-child(7)  { height: 48px; animation-delay: 0.2s;  }
+  .soundwave span:nth-child(8)  { height: 32px; animation-delay: 0.1s;  }
+  .soundwave span:nth-child(9)  { height: 16px; animation-delay: 0s;    }
+  @keyframes wave {
+    0%, 100% { transform: scaleY(0.4); opacity: 0.5; }
+    50%       { transform: scaleY(1);   opacity: 1;   }
+  }
+
+  /* テキストフェード */
+  .loading-label {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--navy);
+    letter-spacing: 0.04em;
+  }
+  .loading-sub {
+    font-size: 0.82rem;
+    color: var(--muted);
+    animation: fadepulse 1.8s ease-in-out infinite;
+  }
+  @keyframes fadepulse {
+    0%, 100% { opacity: 0.4; }
+    50%       { opacity: 1;   }
+  }
+
+  /* ドット進捗 */
+  .loading-dots {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .loading-dots span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--blue);
+    animation: dotpop 1.2s ease-in-out infinite;
+  }
+  .loading-dots span:nth-child(1) { animation-delay: 0s;    }
+  .loading-dots span:nth-child(2) { animation-delay: 0.2s;  }
+  .loading-dots span:nth-child(3) { animation-delay: 0.4s;  }
+  @keyframes dotpop {
+    0%, 80%, 100% { transform: scale(0.6); opacity: 0.3; }
+    40%           { transform: scale(1.2); opacity: 1;   }
+  }
+
+  /* ── ────────────────────── ── */
+  /* スクリーン 5: 結果・共有 */
+  /* ── ────────────────────── ── */
+  .result-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .result-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    background: var(--blue);
+    color: var(--white);
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+  .result-body {
+    white-space: pre-wrap;
+    font-size: 0.98rem;
+    line-height: 1.85;
+    color: var(--text);
+    background: var(--bg);
+    border-radius: 10px;
+    padding: 16px;
+    min-height: 120px;
+    border: 1px solid var(--border);
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+  .share-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .share-grid .btn-green { grid-column: 1 / -1; }
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── トライアルバナー ── */
+  #trial-banner {
+    width: 100%;
+    padding: 10px 16px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: center;
+    line-height: 1.5;
+    position: sticky;
+    top: 52px;
+    z-index: 90;
+  }
+  #trial-banner.free {
+    background: #ecfdf5;
+    color: #065f46;
+    border-bottom: 1px solid #6ee7b7;
+  }
+  #trial-banner.warn {
+    background: #fff7ed;
+    color: #9a3412;
+    border-bottom: 1px solid #fed7aa;
+  }
+  #trial-banner.over {
+    background: #fee2e2;
+    color: #991b1b;
+    border-bottom: 1px solid #fca5a5;
+  }
+
+  /* ── パスワード解除カード ── */
+  .unlock-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 24px 18px;
+    box-shadow: var(--shadow);
+    border: 2px solid #fca5a5;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .unlock-card h3 { color: var(--red); }
+  .unlock-card p { font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
+  .unlock-input-row {
+    display: flex;
+    gap: 8px;
+  }
+  .unlock-input-row input {
+    flex: 1;
+    padding: 12px 14px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.18s;
+  }
+  .unlock-input-row input:focus { border-color: var(--blue); }
+  .btn-unlock {
+    background: var(--navy);
+    color: var(--white);
+    border: none;
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .btn-note {
+    background: #41c9b4;
+    color: var(--white);
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    width: 100%;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+  }
+
+  /* ── 言語選択画面 ── */
+  .lang-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+  .lang-card {
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 8px;
+    cursor: pointer;
+    background: var(--white);
+    text-align: center;
+    transition: border-color 0.18s, background 0.18s;
+    -webkit-tap-highlight-color: transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .lang-card .lang-flag { font-size: 1.8rem; line-height: 1; }
+  .lang-card .lang-name { font-size: 0.78rem; font-weight: 700; color: var(--text); }
+  .lang-card .lang-sub  { font-size: 0.7rem; color: var(--muted); }
+  .lang-card.selected {
+    border-color: var(--blue);
+    background: var(--blue-l);
+    position: relative;
+  }
+  .lang-card.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 5px;
+    right: 8px;
+    color: var(--blue);
+    font-weight: 800;
+    font-size: 0.85rem;
+  }
+
+  /* ── トースト ── */
+  #toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: #1e293b;
+    color: var(--white);
+    padding: 12px 24px;
+    border-radius: 24px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: transform 0.3s ease;
+    z-index: 999;
+    white-space: nowrap;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ── ブラウザ非対応バナー ── */
+  #compat-banner {
+    display: none;
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 0.83rem;
+    color: #856404;
+    line-height: 1.5;
+  }
+</style>
 </head>
 <body>
 
 <header>
-  <span style="font-size:1.3rem;">🎙️</span>
+  <span style="font-size:1.4rem">🎙️</span>
   <span class="logo">ボイス<span>みっけ</span></span>
-  <span class="tagline">考えるを、ひとりにしない。</span>
+  <button class="btn-howto" onclick="showHowto()">使い方</button>
 </header>
 
-<div class="container">
+<div id="trial-banner" class="free">🎁 今なら3回まで無料でお試しいただけます（登録不要）</div>
 
-  <!-- ヒーロー -->
-  <div class="hero-card">
-    <div class="check">🎉</div>
-    <h1>ご購入ありがとうございます！<br>ボイスみっけへようこそ</h1>
-    <p>以下のURLとパスワードですぐに使い始められます。<br>このページをブックマークしておくと便利です。</p>
+  <!-- ======== スクリーン1: トップ ======== -->
+  <div id="screen-top" class="screen active">
+    <div id="compat-banner">
+      ⚠️ お使いのブラウザは音声認識に対応していない可能性があります。<strong>Chrome（Android）</strong>または<strong>Safari（iPhone）</strong>をお使いください。
+    </div>
+    <div class="card hero">
+      <span class="hero-icon">🎙️</span>
+      <h1>録音して、<br><span>すぐ整理。</span></h1>
+      <p>商談・会議・相談をスマホで録音。<br>AIがテーマに合わせて自動整理します。</p>
+      <ul class="feature-list">
+        <li><span class="icon">📝</span><span>議事録・商談記録・越境会議など6テーマ対応</span></li>
+        <li><span class="icon">🌐</span><span>日本語・英語・韓国語・中国語に対応</span></li>
+        <li><span class="icon">⚡</span><span>録音→整理→共有がスマホ1台で完結</span></li>
+        <li><span class="icon">💬</span><span>LINEにワンタップで送信</span></li>
+      </ul>
+      <button class="btn btn-primary btn-record-big" onclick="showLangSelect()">
+        🎙️ 録音を開始する
+      </button>
+    </div>
   </div>
 
-  <!-- アクセス情報 -->
-  <div class="card">
-    <h2>🔑 アクセス情報</h2>
-    <div class="info-row">
-      <div class="info-item">
-        <div class="label">アプリURL</div>
-        <div class="value-row">
-          <span class="value">spc-jp.github.io/voice-mikke/</span>
-          <button class="btn-copy" onclick="copyText('https://spc-jp.github.io/voice-mikke/', 'URLをコピーしました！')">コピー</button>
+  <!-- ======== スクリーン1.5: 言語選択 ======== -->
+  <div id="screen-lang" class="screen">
+    <div class="card">
+      <h3 style="margin-bottom:6px;">🌐 録音する言語を選んでください</h3>
+      <p style="font-size:0.84rem; color:var(--muted); margin-bottom:16px;">「自動」は日本語メインの場合におすすめです</p>
+      <div class="lang-grid">
+        <div class="lang-card selected" data-lang="ja-JP" onclick="selectLang('ja-JP', this)">
+          <span class="lang-flag">🌐</span>
+          <span class="lang-name">自動</span>
+          <span class="lang-sub">Auto</span>
+        </div>
+        <div class="lang-card" data-lang="ja-JP" onclick="selectLang('ja-JP', this)">
+          <span class="lang-flag">🇯🇵</span>
+          <span class="lang-name">日本語</span>
+          <span class="lang-sub">Japanese</span>
+        </div>
+        <div class="lang-card" data-lang="en-US" onclick="selectLang('en-US', this)">
+          <span class="lang-flag">🇺🇸</span>
+          <span class="lang-name">英語</span>
+          <span class="lang-sub">English</span>
+        </div>
+        <div class="lang-card" data-lang="ko-KR" onclick="selectLang('ko-KR', this)">
+          <span class="lang-flag">🇰🇷</span>
+          <span class="lang-name">韓国語</span>
+          <span class="lang-sub">Korean</span>
+        </div>
+        <div class="lang-card" data-lang="zh-CN" onclick="selectLang('zh-CN', this)">
+          <span class="lang-flag">🇨🇳</span>
+          <span class="lang-name">中国語</span>
+          <span class="lang-sub">Chinese</span>
+        </div>
+        <div class="lang-card" data-lang="zh-TW" onclick="selectLang('zh-TW', this)">
+          <span class="lang-flag">🇹🇼</span>
+          <span class="lang-name">繁体字</span>
+          <span class="lang-sub">Traditional</span>
         </div>
       </div>
-      <div class="info-item">
-        <div class="label">パスワード</div>
-        <div class="value-row">
-          <span class="value">Voice-2025</span>
-          <button class="btn-copy" onclick="copyText('Voice-2025', 'パスワードをコピーしました！')">コピー</button>
+    </div>
+    <button class="btn btn-primary btn-record-big" id="btn-start-with-lang" onclick="startRecording()">
+      🎙️ この言語で録音開始
+    </button>
+    <button class="btn btn-ghost btn-sm" onclick="showScreen('screen-top')">
+      ← 戻る
+    </button>
+  </div>
+
+  <!-- ======== スクリーン2: 録音中 ======== -->
+  <div id="screen-record" class="screen">
+    <div class="card record-center">
+      <div class="rec-badge">
+        <span class="rec-dot"></span> REC
+      </div>
+      <div class="pulse-wrapper">
+        <div class="pulse-ring"></div>
+        <div class="pulse-ring"></div>
+        <div class="mic-circle">🎙️</div>
+      </div>
+      <div class="timer" id="timer">00:00</div>
+      <p style="text-align:center; font-size:0.88rem;">話し終わったら停止ボタンを押してください</p>
+    </div>
+    <div class="card">
+      <h3>🔄 リアルタイム文字起こし</h3>
+      <div class="live-text-box">
+        <span id="final-text"></span><span id="interim-text"></span>
+      </div>
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+      <button class="btn btn-orange" id="btn-pause" onclick="pauseRecording()">
+        ⏸️ 一時停止
+      </button>
+      <button class="btn btn-red" onclick="stopRecording()">
+        ⏹️ 停止して次へ
+      </button>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="cancelRecording()">
+      キャンセル
+    </button>
+  </div>
+
+  <!-- ======== スクリーン3: 文字起こし確認＋テーマ ======== -->
+  <div id="screen-transcript" class="screen">
+    <div class="card">
+      <h3>📄 文字起こし結果</h3>
+      <p style="margin-bottom:10px;">内容を確認・編集できます。</p>
+      <textarea id="transcript-text" placeholder="文字起こしテキストがここに表示されます。直接編集もできます。"></textarea>
+    </div>
+    <div class="card">
+      <h3>🗂️ 整理テーマを選択</h3>
+      <p style="margin-bottom:14px;">AIがどの形式で整理するかを選んでください。</p>
+      <div class="theme-grid">
+        <div class="theme-card" data-theme="gijiroku" onclick="selectTheme('gijiroku')">
+          <span class="t-icon">📋</span>
+          <span class="t-name">議事録</span>
+        </div>
+        <div class="theme-card" data-theme="shodan" onclick="selectTheme('shodan')">
+          <span class="t-icon">🤝</span>
+          <span class="t-name">商談記録</span>
+        </div>
+        <div class="theme-card" data-theme="customer" onclick="selectTheme('customer')">
+          <span class="t-icon">👤</span>
+          <span class="t-name">お客様対応メモ</span>
+        </div>
+        <div class="theme-card" data-theme="shigyou" onclick="selectTheme('shigyou')">
+          <span class="t-icon">⚖️</span>
+          <span class="t-name">士業の相談メモ</span>
+        </div>
+        <div class="theme-card" data-theme="idea" onclick="selectTheme('idea')">
+          <span class="t-icon">💡</span>
+          <span class="t-name">アイデア・開発メモ</span>
+        </div>
+        <div class="theme-card" data-theme="global" onclick="selectTheme('global')" style="grid-column: 1 / -1; background: linear-gradient(135deg, #eff6ff, #f0fdf4);">
+          <span class="t-icon">🌐</span>
+          <span class="t-name">越境会議・多言語ミーティング</span>
         </div>
       </div>
     </div>
-    <a class="btn-open" href="https://spc-jp.github.io/voice-mikke/" target="_blank" rel="noopener">
-      🎙️ ボイスみっけを開く →
-    </a>
+    <button class="btn btn-navy" id="btn-summarize" onclick="summarize()" disabled>
+      🎙️ ボイスみっけで整理する
+    </button>
+
+    <!-- 無料体験終了時のみ表示 -->
+    <div id="unlock-section" style="display:none;">
+      <div class="unlock-card">
+        <h3>⚠️ 無料体験が終了しました</h3>
+        <p>引き続きご利用いただくには、ご購入後に届くパスワードを入力してください。買い切り¥980で無制限にお使いいただけます。</p>
+        <a class="btn-note" href="https://buy.stripe.com/dRm6oGdL40AJ6SPg7qcV20Y" target="_blank" rel="noopener" onclick="showPwInput()" style="background: linear-gradient(135deg, #1e3a5f, #1A7FA8);">
+          💳 ¥980で購入してパスワードを入手する
+        </a>
+        <div id="pw-input-area" style="display:none;">
+          <p style="font-size:0.82rem; color:var(--muted); margin-bottom:8px;">購入後、サンクスページに表示されるパスワードを入力してください。</p>
+          <div class="unlock-input-row">
+            <input type="password" id="pw-input" placeholder="パスワードを入力">
+            <button class="btn-unlock" onclick="unlockApp()">解除</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn btn-ghost btn-sm" onclick="backToRecording()">
+      ← 録音に戻る
+    </button>
   </div>
 
-  <!-- QRコード -->
-  <div class="card">
-    <h2>📱 スマホからアクセスする場合</h2>
-    <div class="qr-wrap">
-      <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=https://spc-jp.github.io/voice-mikke/" alt="ボイスみっけ QRコード" width="160" height="160">
-      <p>カメラアプリで読み取るとアプリが開きます</p>
+  <!-- ======== スクリーン4: 処理中 ======== -->
+  <div id="screen-loading" class="screen">
+    <div class="card loading-center">
+      <div class="soundwave">
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span>
+      </div>
+      <div>
+        <p class="loading-label">🎙️ ボイスみっけ 整理中</p>
+        <p class="loading-sub">音声の内容を読み解いています</p>
+      </div>
+      <div class="loading-dots">
+        <span></span><span></span><span></span>
+      </div>
     </div>
   </div>
 
-  <!-- 使い方 -->
-  <div class="card">
-    <h2>📖 はじめての使い方</h2>
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-text">上のURLをブラウザで開く（またはQRコードを読み取る）</div>
+  <!-- ======== スクリーン5: 結果・共有 ======== -->
+  <div id="screen-result" class="screen">
+    <div class="card">
+      <div class="result-header">
+        <span class="result-label" id="theme-label-badge">議事録</span>
+        <span style="font-size:0.82rem; color:var(--muted);">みっけ整理結果</span>
       </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-text">「録音を開始する」をタップ。マイク許可を求められたら「許可」を選択</div>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-text">録音する言語を選んで話す（日本語・英語・韓国語・中国語対応）</div>
-      </div>
-      <div class="step">
-        <div class="step-num">4</div>
-        <div class="step-text">「停止して次へ」→ 整理テーマを選んで「ボイスみっけで整理する」をタップ</div>
-      </div>
-      <div class="step">
-        <div class="step-num">5</div>
-        <div class="step-text">パスワード入力欄に「Voice-2025」を入力して解除。以降は無制限でご利用いただけます</div>
-      </div>
-      <div class="step">
-        <div class="step-num">6</div>
-        <div class="step-text">整理結果をコピーしてLINEやチャットにすぐ共有できます</div>
-      </div>
+      <div style="font-size:0.78rem; color:var(--muted); margin-bottom:10px;" id="result-datetime"></div>
+      <div class="result-body" id="result-text"></div>
     </div>
+    <div class="card">
+      <h3>📤 共有・保存</h3>
+      <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:12px;">
+        <button class="btn btn-green" onclick="copyResult()">
+          📋 コピーする
+        </button>
+        <button class="btn btn-line" onclick="shareToLine()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.627-.63h2.386c.349 0 .63.285.63.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.627-.63.349 0 .631.285.631.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.281.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.070 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
+          LINEで送る
+        </button>
+      </div>
+      <div class="divider">または</div>
+    </div>
+    <button class="btn btn-primary" onclick="resetAll()">
+      🎙️ 新しく録音する
+    </button>
+    <button class="btn btn-ghost btn-sm" onclick="showScreen('screen-transcript')">
+      ← テーマを変更する
+    </button>
   </div>
 
-  <!-- 注意事項 -->
-  <div class="notice">
-    ⚠️ このページのURLとパスワードは第三者と共有しないようお願いします。<br>
-    ご不明な点は <a href="mailto:spc@smileplusctg.com">spc@smileplusctg.com</a> までお気軽にご連絡ください。
-  </div>
-
-</div>
-
-<footer>
-  Smile Plus Consulting（スマイルプラスコンサルティング）<br>
-  <a href="https://smileplusctg.com" target="_blank">smileplusctg.com</a>
-</footer>
+</div><!-- /container -->
 
 <div id="toast"></div>
 
+<!-- ======== 使い方モーダル ======== -->
+<div id="howto-overlay" onclick="closeHowto()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:200;"></div>
+<div id="howto-modal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:92%; max-width:460px; max-height:85vh; overflow-y:auto; background:#fff; border-radius:18px; padding:24px 20px; z-index:201; box-shadow:0 8px 40px rgba(0,0,0,0.2);">
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;">
+    <h2 style="font-size:1.1rem; color:#1e3a5f;">📖 ボイスみっけ 使い方</h2>
+    <button onclick="closeHowto()" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:#64748b; line-height:1;">×</button>
+  </div>
+
+  <div style="background:#eff6ff; border-radius:12px; padding:14px 16px; margin-bottom:18px;">
+    <p style="font-size:0.88rem; font-weight:700; color:#1e3a5f; margin-bottom:6px;">🎯 このアプリでできること</p>
+    <p style="font-size:0.86rem; color:#1e293b; line-height:1.7;">商談・会議・相談ごとをスマホで録音するだけで、議事録・商談記録・対応メモなどに自動整理。日本語・英語・韓国語・中国語の多言語会議にも対応。そのままコピーしてLINEやチャットにすぐ共有できます。</p>
+  </div>
+
+  <p style="font-size:0.88rem; font-weight:700; color:#1e3a5f; margin-bottom:10px;">📋 使い方ステップ</p>
+  <ol style="padding-left:0; list-style:none; display:flex; flex-direction:column; gap:10px; margin-bottom:18px;">
+    <li style="display:flex; gap:12px; align-items:flex-start;">
+      <span style="background:#1e3a5f; color:#fff; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:700; flex-shrink:0;">1</span>
+      <div>
+        <p style="font-size:0.9rem; font-weight:700; color:#1e293b; margin-bottom:2px;">「録音を開始する」をタップ</p>
+        <p style="font-size:0.82rem; color:#64748b; line-height:1.5;">マイク許可を求められたら「許可」を選択してください。</p>
+      </div>
+    </li>
+    <li style="display:flex; gap:12px; align-items:flex-start;">
+      <span style="background:#1e3a5f; color:#fff; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:700; flex-shrink:0;">2</span>
+      <div>
+        <p style="font-size:0.9rem; font-weight:700; color:#1e293b; margin-bottom:2px;">🌐 録音する言語を選ぶ</p>
+        <p style="font-size:0.82rem; color:#64748b; line-height:1.5;">自動・日本語・英語・韓国語・中国語・繁体字から選べます。日本語メインの場合は「自動」のままでOKです。選んだ言語のボタンをタップして録音開始。</p>
+      </div>
+    </li>
+    <li style="display:flex; gap:12px; align-items:flex-start;">
+      <span style="background:#1e3a5f; color:#fff; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:700; flex-shrink:0;">3</span>
+      <div>
+        <p style="font-size:0.9rem; font-weight:700; color:#1e293b; margin-bottom:2px;">話す</p>
+        <p style="font-size:0.82rem; color:#64748b; line-height:1.5;">リアルタイムで文字起こしされます。途中で「⏸️ 一時停止」→「▶️ 録音を再開」で中断・再開も可能です。</p>
+      </div>
+    </li>
+    <li style="display:flex; gap:12px; align-items:flex-start;">
+      <span style="background:#1e3a5f; color:#fff; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:700; flex-shrink:0;">4</span>
+      <div>
+        <p style="font-size:0.9rem; font-weight:700; color:#1e293b; margin-bottom:2px;">「停止して次へ」をタップ</p>
+        <p style="font-size:0.82rem; color:#64748b; line-height:1.5;">文字起こし内容を確認・編集できます。間違いがあれば直接修正してください。</p>
+      </div>
+    </li>
+    <li style="display:flex; gap:12px; align-items:flex-start;">
+      <span style="background:#1e3a5f; color:#fff; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:700; flex-shrink:0;">5</span>
+      <div>
+        <p style="font-size:0.9rem; font-weight:700; color:#1e293b; margin-bottom:2px;">整理テーマを選んで「ボイスみっけで整理する」</p>
+        <p style="font-size:0.82rem; color:#64748b; line-height:1.5;">議事録・商談記録・お客様対応メモ・士業の相談メモ・アイデアメモ・🌐越境会議の6種類から選べます。越境会議では翻訳・要約・アクション整理を一括で行います。</p>
+      </div>
+    </li>
+    <li style="display:flex; gap:12px; align-items:flex-start;">
+      <span style="background:#1e3a5f; color:#fff; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:700; flex-shrink:0;">6</span>
+      <div>
+        <p style="font-size:0.9rem; font-weight:700; color:#1e293b; margin-bottom:2px;">コピー・LINEで共有</p>
+        <p style="font-size:0.82rem; color:#64748b; line-height:1.5;">整理結果をコピーしてLINEやチャットにすぐ貼り付けられます。日時も自動で付きます。</p>
+      </div>
+    </li>
+  </ol>
+
+  <div style="background:#fff7ed; border:1px solid #fed7aa; border-radius:10px; padding:12px 14px; margin-bottom:18px;">
+    <p style="font-size:0.82rem; color:#9a3412; line-height:1.6;">
+      📌 <strong>ご利用の前に</strong><br>
+      マイクの使用許可が必要です。ブラウザから許可を求められた場合は「許可」を選択してください。<br>
+      推奨ブラウザ：Chrome（Android）/ Safari（iPhone）
+    </p>
+  </div>
+
+  <button onclick="closeHowto()" style="width:100%; padding:14px; background:#1e3a5f; color:#fff; border:none; border-radius:12px; font-size:1rem; font-weight:700; cursor:pointer;">
+    閉じる
+  </button>
+</div>
+
 <script>
-function copyText(text, msg) {
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text)
-      .then(() => showToast('✅ ' + msg))
-      .catch(() => fallbackCopy(text, msg));
+// ─────────────────────────────────────────────
+// 設定
+// ─────────────────────────────────────────────
+const WORKER_URL   = 'https://voice-mikke.yymmatsu.workers.dev';
+const TRIAL_LIMIT  = 3;
+const UNLOCK_PASS  = 'Voice-2025';           // ← noteに記載するパスワード
+const NOTE_URL     = 'https://note.com/_yoshibon/n/nbfa4864823d3';
+const LS_COUNT     = 'voicemikke_trial_count';
+const LS_UNLOCKED  = 'voicemikke_unlocked';
+
+// ─────────────────────────────────────────────
+// テーマ定義
+// ─────────────────────────────────────────────
+const THEMES = {
+  gijiroku: '議事録',
+  shodan:   '商談記録',
+  customer: 'お客様対応メモ',
+  shigyou:  '士業の相談メモ',
+  idea:     'アイデア・開発メモ',
+  global:   '越境会議・多言語',
+};
+
+// ─────────────────────────────────────────────
+// グローバル状態
+// ─────────────────────────────────────────────
+let recognition      = null;
+let isRecording      = false;
+let isPaused         = false;
+let finalTranscript  = '';
+let timerInterval    = null;
+let elapsedSeconds   = 0;
+let selectedTheme    = '';
+let selectedLang     = 'ja-JP'; // デフォルト：日本語
+
+// ─────────────────────────────────────────────
+// トライアル管理
+// ─────────────────────────────────────────────
+function isUnlocked() {
+  return localStorage.getItem(LS_UNLOCKED) === '1';
+}
+
+function getTrialCount() {
+  return parseInt(localStorage.getItem(LS_COUNT) || '0', 10);
+}
+
+function incrementTrial() {
+  const n = getTrialCount() + 1;
+  localStorage.setItem(LS_COUNT, n);
+  return n;
+}
+
+function updateTrialBanner() {
+  const banner = document.getElementById('trial-banner');
+  if (isUnlocked()) {
+    banner.style.display = 'none';
+    return;
+  }
+  const used = getTrialCount();
+  const left = TRIAL_LIMIT - used;
+  banner.style.display = 'block';
+  if (used === 0) {
+    banner.className = 'free';
+    banner.textContent = '🎁 今なら3回まで無料でお試しいただけます（登録不要）';
+  } else if (left > 0) {
+    banner.className = 'warn';
+    banner.textContent = `🎁 無料体験 残り${left}回（全${TRIAL_LIMIT}回）`;
   } else {
-    fallbackCopy(text, msg);
+    banner.className = 'over';
+    banner.textContent = '⚠️ 無料体験が終了しました　→ ¥980で購入して続けて使う';
   }
 }
 
-function fallbackCopy(text, msg) {
+function checkTrialLimit() {
+  if (isUnlocked()) return true;
+  return getTrialCount() < TRIAL_LIMIT;
+}
+
+function showUnlockSection() {
+  document.getElementById('btn-summarize').style.display = 'none';
+  document.getElementById('unlock-section').style.display = 'block';
+  // noteリンクを最新URLに更新
+  document.querySelector('.btn-note').href = NOTE_URL;
+}
+
+function hideUnlockSection() {
+  document.getElementById('btn-summarize').style.display = 'flex';
+  document.getElementById('unlock-section').style.display = 'none';
+}
+
+function showPwInput() {
+  setTimeout(() => {
+    document.getElementById('pw-input-area').style.display = 'block';
+  }, 400);
+}
+
+function unlockApp() {
+  const input = document.getElementById('pw-input').value.trim();
+  if (input === UNLOCK_PASS) {
+    localStorage.setItem(LS_UNLOCKED, '1');
+    showToast('🎉 解除しました！これからは無制限でご利用いただけます');
+    hideUnlockSection();
+    updateTrialBanner();
+    // 整理ボタンが選択済みなら有効化
+    if (selectedTheme) {
+      document.getElementById('btn-summarize').disabled = false;
+    }
+  } else {
+    showToast('❌ パスワードが違います');
+    document.getElementById('pw-input').value = '';
+    document.getElementById('pw-input').focus();
+  }
+}
+
+// ─────────────────────────────────────────────
+// 初期化
+// ─────────────────────────────────────────────
+(function init() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    document.getElementById('compat-banner').style.display = 'block';
+  }
+  updateTrialBanner();
+})();
+
+// ─────────────────────────────────────────────
+// 画面切替
+// ─────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  // テーマ画面に来るたびにトライアル状態を更新
+  if (id === 'screen-transcript') {
+    if (!checkTrialLimit()) {
+      showUnlockSection();
+    } else {
+      hideUnlockSection();
+    }
+  }
+}
+
+// ─────────────────────────────────────────────
+// 言語選択
+// ─────────────────────────────────────────────
+function showLangSelect() {
+  showScreen('screen-lang');
+}
+
+function selectLang(lang, el) {
+  selectedLang = lang;
+  document.querySelectorAll('.lang-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  // ボタンラベルを選択した言語名に更新
+  const name = el.querySelector('.lang-name').textContent;
+  document.getElementById('btn-start-with-lang').textContent = `🎙️ ${name}で録音開始`;
+}
+
+// ─────────────────────────────────────────────
+// 録音開始（新規）
+// ─────────────────────────────────────────────
+function startRecording() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    alert('音声認識に対応していません。Chrome（Android）またはSafari（iPhone）でお試しください。');
+    return;
+  }
+
+  // 完全リセット
+  finalTranscript = '';
+  elapsedSeconds  = 0;
+  isPaused        = false;
+  isRecording     = true;
+
+  document.getElementById('timer').textContent         = '00:00';
+  document.getElementById('final-text').textContent    = '';
+  document.getElementById('interim-text').textContent  = '';
+
+  setupRecognition();
+  recognition.start();
+  startTimer();
+  showScreen('screen-record');
+
+  // 一時停止ボタンを初期状態に戻す
+  const btn = document.getElementById('btn-pause');
+  btn.textContent = '⏸️ 一時停止';
+  btn.className   = 'btn btn-orange';
+  btn.onclick     = pauseRecording;
+  const badge = document.querySelector('.rec-badge');
+  if (badge) badge.innerHTML = '<span class="rec-dot"></span> REC';
+}
+
+function setupRecognition() {
+  // 既存のrecognitionを破棄
+  if (recognition) {
+    try { recognition.abort(); } catch(_) {}
+    recognition = null;
+  }
+
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SR();
+  recognition.lang            = selectedLang;
+  recognition.continuous      = true;
+  recognition.interimResults  = true;
+  recognition.maxAlternatives = 1;
+
+  recognition.onresult = (e) => {
+    let interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const t = e.results[i][0].transcript;
+      if (e.results[i].isFinal) {
+        finalTranscript += t;
+      } else {
+        interim += t;
+      }
+    }
+    document.getElementById('final-text').textContent   = finalTranscript;
+    document.getElementById('interim-text').textContent = interim;
+    // 末尾に自動スクロール
+    const box = document.querySelector('.live-text-box');
+    box.scrollTop = box.scrollHeight;
+  };
+
+  recognition.onerror = (e) => {
+    if (e.error === 'not-allowed') {
+      alert('マイクへのアクセスが拒否されました。\nブラウザの設定でマイクを許可してからお試しください。');
+      cancelRecording();
+    }
+    // no-speech / network はそのまま続行
+  };
+
+  // 自動停止後に再起動（長時間録音対応・pauseでない場合のみ）
+  recognition.onend = () => {
+    if (isRecording && !isPaused) {
+      try { recognition.start(); } catch(_) {}
+    }
+  };
+}
+
+function startTimer() {
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    elapsedSeconds++;
+    const m = String(Math.floor(elapsedSeconds / 60)).padStart(2, '0');
+    const s = String(elapsedSeconds % 60).padStart(2, '0');
+    document.getElementById('timer').textContent = `${m}:${s}`;
+  }, 1000);
+}
+
+// ─────────────────────────────────────────────
+// 一時停止・再開
+// ─────────────────────────────────────────────
+function pauseRecording() {
+  isPaused    = true;
+  isRecording = false;
+  clearInterval(timerInterval);
+  if (recognition) {
+    try { recognition.stop(); } catch(_) {}
+  }
+  // ボタンを「再開」に切り替え
+  const btn = document.getElementById('btn-pause');
+  btn.textContent = '▶️ 録音を再開';
+  btn.className   = 'btn btn-green';
+  btn.onclick     = resumeRecording;
+  // rec-badgeをPAUSEに変更
+  const badge = document.querySelector('.rec-badge');
+  if (badge) badge.innerHTML = '<span style="width:8px;height:8px;border-radius:50%;background:#ea7000;display:inline-block;margin-right:6px;"></span> PAUSE';
+  showToast('⏸️ 一時停止中');
+}
+
+function resumeRecording() {
+  isPaused    = false;
+  isRecording = true;
+  startTimer();
+  setupRecognition();
+  try {
+    recognition.start();
+  } catch(e) {
+    showToast('再開できませんでした。マイク許可を確認してください。');
+    return;
+  }
+  // ボタンを「一時停止」に戻す
+  const btn = document.getElementById('btn-pause');
+  btn.textContent = '⏸️ 一時停止';
+  btn.className   = 'btn btn-orange';
+  btn.onclick     = pauseRecording;
+  // rec-badgeをRECに戻す
+  const badge = document.querySelector('.rec-badge');
+  if (badge) badge.innerHTML = '<span class="rec-dot"></span> REC';
+  showToast('🎙️ 録音を再開しました');
+}
+
+// ─────────────────────────────────────────────
+// 録音停止（→テーマ選択画面へ）
+// ─────────────────────────────────────────────
+function stopRecording() {
+  isPaused    = true;
+  isRecording = false;
+  clearInterval(timerInterval);
+  if (recognition) {
+    try { recognition.stop(); } catch(_) {}
+  }
+
+  const text = finalTranscript.trim();
+  if (!text) {
+    showToast('音声が認識されませんでした。もう一度お試しください。');
+    // 録音画面に留まって再開できるようにする
+    isPaused    = false;
+    isRecording = true;
+    startTimer();
+    try { recognition.start(); } catch(_) { setupRecognition(); recognition.start(); }
+    return;
+  }
+
+  document.getElementById('transcript-text').value = text;
+  selectedTheme = '';
+  document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('btn-summarize').disabled = true;
+  showScreen('screen-transcript');
+}
+
+// ─────────────────────────────────────────────
+// 録音に戻る（テーマ選択画面 → 録音画面）
+// ─────────────────────────────────────────────
+function backToRecording() {
+  // 録音を再開する
+  isPaused    = false;
+  isRecording = true;
+
+  document.getElementById('final-text').textContent   = finalTranscript;
+  document.getElementById('interim-text').textContent = '';
+
+  showScreen('screen-record');
+  startTimer();
+
+  setupRecognition();
+  try {
+    recognition.start();
+  } catch(e) {
+    showToast('録音を再開できませんでした。マイク許可を確認してください。');
+  }
+}
+
+// ─────────────────────────────────────────────
+// キャンセル（トップへ戻る・全リセット）
+// ─────────────────────────────────────────────
+function cancelRecording() {
+  isPaused    = false;
+  isRecording = false;
+  clearInterval(timerInterval);
+  if (recognition) {
+    try { recognition.abort(); } catch(_) {}
+    recognition = null;
+  }
+  finalTranscript = '';
+  elapsedSeconds  = 0;
+  document.getElementById('timer').textContent         = '00:00';
+  document.getElementById('final-text').textContent    = '';
+  document.getElementById('interim-text').textContent  = '';
+  showScreen('screen-top');
+}
+
+// ─────────────────────────────────────────────
+// 全リセット（結果画面 → トップ）
+// ─────────────────────────────────────────────
+function resetAll() {
+  isPaused        = false;
+  isRecording     = false;
+  finalTranscript = '';
+  selectedTheme   = '';
+  elapsedSeconds  = 0;
+  clearInterval(timerInterval);
+  if (recognition) {
+    try { recognition.abort(); } catch(_) {}
+    recognition = null;
+  }
+  document.getElementById('transcript-text').value      = '';
+  document.getElementById('result-text').textContent    = '';
+  document.getElementById('timer').textContent          = '00:00';
+  document.getElementById('final-text').textContent     = '';
+  document.getElementById('interim-text').textContent   = '';
+  document.getElementById('btn-summarize').disabled     = true;
+  document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('selected'));
+  showScreen('screen-top');
+}
+function selectTheme(theme) {
+  selectedTheme = theme;
+  document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('selected'));
+  document.querySelector(`.theme-card[data-theme="${theme}"]`).classList.add('selected');
+  // 解除済み or 残回数あり の場合のみ整理ボタンを有効化
+  if (checkTrialLimit()) {
+    document.getElementById('btn-summarize').disabled = false;
+  }
+}
+
+// ─────────────────────────────────────────────
+// AI整理（Cloudflare Worker → Claude API）
+// ─────────────────────────────────────────────
+async function summarize() {
+  // トライアルチェック
+  if (!checkTrialLimit()) {
+    showUnlockSection();
+    showToast('無料体験が終了しました。パスワードを入力してください。');
+    return;
+  }
+
+  const text = document.getElementById('transcript-text').value.trim();
+  if (!text) { showToast('テキストが空です。'); return; }
+  if (!selectedTheme) { showToast('テーマを選んでください。'); return; }
+
+  // カウントアップ（解除済みの場合はカウントしない）
+  if (!isUnlocked()) {
+    incrementTrial();
+    updateTrialBanner();
+  }
+
+  showScreen('screen-loading');
+
+  try {
+    const res = await fetch(`${WORKER_URL}/summarize`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, theme: selectedTheme }),
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err);
+    }
+
+    const data = await res.json();
+
+    // 日時を取得してセット
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('ja-JP', { year:'numeric', month:'long', day:'numeric', weekday:'short' });
+    const timeStr = now.toLocaleTimeString('ja-JP', { hour:'2-digit', minute:'2-digit' });
+    const datetimeText = `📅 ${dateStr} ${timeStr}`;
+    document.getElementById('result-datetime').textContent = datetimeText;
+
+    document.getElementById('result-text').textContent = data.result;
+    document.getElementById('theme-label-badge').textContent = THEMES[selectedTheme] || selectedTheme;
+    showScreen('screen-result');
+
+  } catch (err) {
+    console.error(err);
+    showScreen('screen-transcript');
+    showToast('エラーが発生しました。WorkerのURLを確認してください。');
+  }
+}
+
+// ─────────────────────────────────────────────
+// 共有
+// ─────────────────────────────────────────────
+function getShareText() {
+  const datetime = document.getElementById('result-datetime').textContent;
+  const result   = document.getElementById('result-text').textContent;
+  return datetime ? `${datetime}\n\n${result}` : result;
+}
+
+function copyResult() {
+  const text = getShareText();
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text)
+      .then(() => showToast('✅ コピーしました！'))
+      .catch(() => fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
+
+function fallbackCopy(text) {
   const ta = document.createElement('textarea');
   ta.value = text;
   ta.style.position = 'fixed';
-  ta.style.opacity = '0';
+  ta.style.opacity  = '0';
   document.body.appendChild(ta);
   ta.focus();
   ta.select();
   document.execCommand('copy');
   document.body.removeChild(ta);
-  showToast('✅ ' + msg);
+  showToast('✅ コピーしました！');
 }
 
+function shareToLine() {
+  const text = getShareText();
+  const url  = `https://line.me/R/msg/text/?${encodeURIComponent(text)}`;
+  window.open(url, '_blank');
+}
+
+// ─────────────────────────────────────────────
+// リセット
+// ─────────────────────────────────────────────
+// ─────────────────────────────────────────────
+// 使い方モーダル
+// ─────────────────────────────────────────────
+function showHowto() {
+  document.getElementById('howto-overlay').style.display = 'block';
+  document.getElementById('howto-modal').style.display   = 'block';
+  document.body.style.overflow = 'hidden';
+}
+function closeHowto() {
+  document.getElementById('howto-overlay').style.display = 'none';
+  document.getElementById('howto-modal').style.display   = 'none';
+  document.body.style.overflow = '';
+}
+
+// ─────────────────────────────────────────────
+// トースト通知
+// ─────────────────────────────────────────────
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;

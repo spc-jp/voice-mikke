@@ -629,6 +629,86 @@
     font-size: 0.85rem;
   }
 
+  /* ── 履歴モーダル ── */
+  .history-item {
+    background: var(--bg);
+    border-radius: 10px;
+    padding: 14px;
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .history-item-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .history-item-meta {
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+  .history-item-theme {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--blue);
+    background: var(--blue-l);
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+  .history-item-preview {
+    font-size: 0.82rem;
+    color: var(--text);
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .history-item-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+  }
+  .btn-history-copy {
+    flex: 1;
+    background: var(--navy);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    padding: 8px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .btn-history-save {
+    flex: 1;
+    background: var(--green);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    padding: 8px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .btn-history-delete {
+    background: none;
+    border: 1px solid #fca5a5;
+    color: var(--red);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 0.8rem;
+    cursor: pointer;
+  }
+  .history-empty {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.88rem;
+    padding: 30px 0;
+  }
+
   /* ── トースト ── */
   #toast {
     position: fixed;
@@ -872,9 +952,15 @@
           <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.627-.63h2.386c.349 0 .63.285.63.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.627-.63.349 0 .631.285.631.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.281.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.070 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
           LINEで送る
         </button>
+        <button class="btn" style="background:#0EA5E9; color:#fff;" onclick="saveAsText()">
+          💾 テキストファイルで保存
+        </button>
       </div>
       <div class="divider">または</div>
     </div>
+    <button class="btn btn-ghost btn-sm" onclick="showHistory()">
+      📂 過去の整理履歴を見る
+    </button>
     <button class="btn btn-primary" onclick="resetAll()">
       🎙️ 新しく録音する
     </button>
@@ -886,6 +972,21 @@
 </div><!-- /container -->
 
 <div id="toast"></div>
+
+<!-- ======== 履歴モーダル ======== -->
+<div id="history-overlay" onclick="closeHistory()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:200;"></div>
+<div id="history-modal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:92%; max-width:460px; max-height:85vh; overflow-y:auto; background:#fff; border-radius:18px; padding:24px 20px; z-index:201; box-shadow:0 8px 40px rgba(0,0,0,0.2);">
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;">
+    <h2 style="font-size:1.1rem; color:#1e3a5f;">📂 整理履歴（最大10件）</h2>
+    <button onclick="closeHistory()" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:#64748b; line-height:1;">×</button>
+  </div>
+  <div id="history-list"></div>
+  <div style="margin-top:16px; padding-top:16px; border-top:1px solid var(--border);">
+    <button onclick="clearAllHistory()" style="width:100%; padding:10px; background:none; border:1px solid #fca5a5; color:#ef4444; border-radius:10px; font-size:0.85rem; cursor:pointer;">
+      🗑️ 履歴をすべて削除
+    </button>
+  </div>
+</div>
 
 <!-- ======== 使い方モーダル ======== -->
 <div id="howto-overlay" onclick="closeHowto()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:200;"></div>
@@ -1400,6 +1501,10 @@ async function summarize() {
 
     document.getElementById('result-text').textContent = data.result;
     document.getElementById('theme-label-badge').textContent = THEMES[selectedTheme] || selectedTheme;
+
+    // 履歴に自動保存
+    saveHistory(selectedTheme, datetimeText, data.result);
+
     showScreen('screen-result');
 
   } catch (err) {
@@ -1451,6 +1556,127 @@ function shareToLine() {
 // ─────────────────────────────────────────────
 // リセット
 // ─────────────────────────────────────────────
+// ─────────────────────────────────────────────
+// 履歴管理（LocalStorage・最大10件）
+// ─────────────────────────────────────────────
+const LS_HISTORY  = 'voicemikke_history';
+const HISTORY_MAX = 10;
+
+function saveHistory(theme, datetime, result) {
+  let history = getHistory();
+  const item = {
+    id:       Date.now(),
+    theme:    theme,
+    themeName: THEMES[theme] || theme,
+    datetime: datetime,
+    result:   result,
+  };
+  history.unshift(item); // 先頭に追加
+  if (history.length > HISTORY_MAX) history = history.slice(0, HISTORY_MAX);
+  localStorage.setItem(LS_HISTORY, JSON.stringify(history));
+}
+
+function getHistory() {
+  try {
+    return JSON.parse(localStorage.getItem(LS_HISTORY) || '[]');
+  } catch { return []; }
+}
+
+function deleteHistory(id) {
+  let history = getHistory().filter(h => h.id !== id);
+  localStorage.setItem(LS_HISTORY, JSON.stringify(history));
+  renderHistory();
+}
+
+function clearAllHistory() {
+  if (!confirm('履歴をすべて削除しますか？')) return;
+  localStorage.removeItem(LS_HISTORY);
+  renderHistory();
+  showToast('🗑️ 履歴を削除しました');
+}
+
+function showHistory() {
+  renderHistory();
+  document.getElementById('history-overlay').style.display = 'block';
+  document.getElementById('history-modal').style.display   = 'block';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeHistory() {
+  document.getElementById('history-overlay').style.display = 'none';
+  document.getElementById('history-modal').style.display   = 'none';
+  document.body.style.overflow = '';
+}
+
+function renderHistory() {
+  const list    = document.getElementById('history-list');
+  const history = getHistory();
+
+  if (history.length === 0) {
+    list.innerHTML = '<div class="history-empty">📭 まだ履歴がありません</div>';
+    return;
+  }
+
+  list.innerHTML = history.map(h => `
+    <div class="history-item" style="margin-bottom:12px;">
+      <div class="history-item-header">
+        <span class="history-item-theme">${h.themeName}</span>
+        <span class="history-item-meta">${h.datetime}</span>
+      </div>
+      <div class="history-item-preview">${h.result}</div>
+      <div class="history-item-actions">
+        <button class="btn-history-copy" onclick="copyHistoryItem(${h.id})">📋 コピー</button>
+        <button class="btn-history-save" onclick="saveHistoryItemAsText(${h.id})">💾 保存</button>
+        <button class="btn-history-delete" onclick="deleteHistory(${h.id})">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function copyHistoryItem(id) {
+  const item = getHistory().find(h => h.id === id);
+  if (!item) return;
+  const text = `${item.datetime}\n\n${item.result}`;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => showToast('✅ コピーしました！'));
+  } else {
+    fallbackCopy(text);
+    showToast('✅ コピーしました！');
+  }
+}
+
+function saveHistoryItemAsText(id) {
+  const item = getHistory().find(h => h.id === id);
+  if (!item) return;
+  const text     = `${item.datetime}\n\n${item.result}`;
+  const filename = `ボイスみっけ_${item.themeName}_${item.datetime.replace(/[/:： ]/g, '-')}.txt`;
+  downloadText(text, filename);
+}
+
+// ─────────────────────────────────────────────
+// テキストファイル保存
+// ─────────────────────────────────────────────
+function saveAsText() {
+  const datetime = document.getElementById('result-datetime').textContent;
+  const result   = document.getElementById('result-text').textContent;
+  const text     = `${datetime}\n\n${result}`;
+  const filename = `ボイスみっけ_${THEMES[selectedTheme] || '記録'}_${datetime.replace(/[/:： ]/g, '-')}.txt`;
+  downloadText(text, filename);
+}
+
+function downloadText(text, filename) {
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('💾 保存しました！');
+}
+
 // ─────────────────────────────────────────────
 // 使い方モーダル
 // ─────────────────────────────────────────────
